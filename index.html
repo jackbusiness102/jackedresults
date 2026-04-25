@@ -6,1026 +6,1345 @@
 <title>JackedByJack — Lead Pipeline</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg: #0a0a0a;
-  --bg-2: #111;
-  --bg-3: #1a1a1a;
-  --line: #222;
-  --line-bright: #333;
-  --text: #f5f5f5;
-  --text-dim: #888;
-  --text-very-dim: #555;
-  --accent: #d4ff00;
-  --accent-dim: #9aba00;
-  --hot: #ff3366;
-  --warm: #ff8800;
-  --cool: #00aaff;
-  --converted: #00ff88;
+  --bg:        #f8fafc;
+  --surface:   #ffffff;
+  --surface-2: #f1f5f9;
+  --border:    #e2e8f0;
+  --text:      #0f172a;
+  --text-2:    #475569;
+  --text-3:    #94a3b8;
+  --accent:    #6366f1;
+  --accent-dk: #4f46e5;
+  --accent-bg: #eef2ff;
+  --green:     #10b981;
+  --green-bg:  #ecfdf5;
+  --amber:     #f59e0b;
+  --amber-bg:  #fffbeb;
+  --red:       #ef4444;
+  --red-bg:    #fef2f2;
+  --blue:      #3b82f6;
+  --blue-bg:   #eff6ff;
+  --r:         8px;
+  --r-sm:      6px;
 }
 
 html, body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Inter', sans-serif;
-  font-feature-settings: 'ss01', 'ss02';
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(circle at 20% 0%, rgba(212, 255, 0, 0.08), transparent 40%),
-    radial-gradient(circle at 80% 100%, rgba(255, 51, 102, 0.05), transparent 40%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-  background-size: 32px 32px;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.app {
-  position: relative;
-  z-index: 1;
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 32px;
-}
-
-/* HEADER */
-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 32px;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.brand h1 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 56px;
-  letter-spacing: 2px;
-  line-height: 0.9;
-  color: var(--text);
-}
-
-.brand h1 span {
-  color: var(--accent);
-}
-
-.brand p {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--text-dim);
-  margin-top: 4px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.header-stats {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
-.stat-pill {
-  background: var(--bg-2);
-  border: 1px solid var(--line);
-  padding: 12px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.stat-pill .num {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
-  letter-spacing: 1px;
-  line-height: 1;
-  color: var(--accent);
-}
-
-.stat-pill .label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--text-dim);
-}
-
-/* CONTROL BAR */
-.control-bar {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 16px;
-  margin-bottom: 24px;
-  align-items: center;
-}
-
-.upload-zone {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px 24px;
-  background: var(--bg-2);
-  border: 1px dashed var(--line-bright);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.upload-zone:hover {
-  border-color: var(--accent);
-  background: var(--bg-3);
-}
-
-.upload-zone .icon {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--accent);
-  color: var(--bg);
-  font-weight: 900;
-  font-size: 20px;
-}
-
-.upload-zone .text {
-  flex: 1;
-}
-
-.upload-zone .text-main {
-  font-weight: 700;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
 }
 
-.upload-zone .text-sub {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 2px;
+/* ── Header ── */
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
 }
-
-.source-select {
-  background: var(--bg-2);
-  border: 1px solid var(--line);
-  color: var(--text);
-  padding: 16px 20px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  outline: none;
+.header-inner {
+  max-width: 1400px; margin: 0 auto; padding: 0 20px;
+  height: 58px; display: flex; align-items: center; gap: 20px;
 }
-
-.source-select:focus {
-  border-color: var(--accent);
+.brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.brand-mark {
+  width: 32px; height: 32px; background: var(--accent);
+  border-radius: var(--r-sm); display: flex; align-items: center;
+  justify-content: center; color: #fff; font-weight: 700; font-size: 16px;
 }
+.brand-name { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
+.brand-name span { color: var(--accent); }
+.header-stats { display: flex; gap: 28px; margin-left: auto; }
+.h-stat { text-align: center; }
+.h-stat-num { font-size: 19px; font-weight: 700; line-height: 1; }
+.h-stat-lbl { font-size: 11px; color: var(--text-3); font-weight: 500; text-transform: uppercase; letter-spacing: .4px; margin-top: 1px; }
 
+/* ── Nav ── */
+.app-nav { background: var(--surface); border-bottom: 1px solid var(--border); }
+.nav-inner {
+  max-width: 1400px; margin: 0 auto; padding: 0 20px;
+  display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+.nav-tab {
+  background: none; border: none; cursor: pointer;
+  padding: 11px 16px; font-size: 14px; font-weight: 500;
+  color: var(--text-2); border-bottom: 2px solid transparent;
+  white-space: nowrap; transition: color .15s, border-color .15s; font-family: inherit;
+}
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── Content ── */
+.app-content { max-width: 1400px; margin: 0 auto; padding: 24px 20px 60px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── Cards ── */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 20px; }
+.card-title { font-size: 15px; font-weight: 600; }
+.card-sub { font-size: 13px; color: var(--text-3); margin-top: 2px; }
+
+/* ── Buttons ── */
 .btn {
-  background: var(--accent);
-  color: var(--bg);
-  border: none;
-  padding: 16px 28px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  cursor: pointer;
-  transition: transform 0.1s;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: var(--r-sm);
+  font-size: 14px; font-weight: 500; border: none;
+  cursor: pointer; transition: background .12s, color .12s;
+  white-space: nowrap; text-decoration: none; font-family: inherit;
 }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--accent-dk); }
+.btn-secondary { background: var(--surface); color: var(--text-2); border: 1px solid var(--border); }
+.btn-secondary:hover:not(:disabled) { background: var(--surface-2); color: var(--text); }
+.btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid #fca5a5; }
+.btn-danger:hover:not(:disabled) { background: #fee2e2; }
+.btn-ghost { background: none; color: var(--text-3); padding: 6px 8px; }
+.btn-ghost:hover:not(:disabled) { color: var(--text); background: var(--surface-2); }
+.btn-sm { padding: 6px 11px; font-size: 13px; }
+.btn-xs { padding: 4px 8px; font-size: 12px; }
 
-.btn:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 var(--text);
+/* ── Inputs ── */
+.input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 8px 11px;
+  font-size: 14px; color: var(--text); outline: none;
+  transition: border-color .12s, box-shadow .12s; font-family: inherit;
 }
+.input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
+.input::placeholder { color: var(--text-3); }
+select.input { cursor: pointer; }
+.form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text-2); margin-bottom: 4px; }
+.form-group { margin-bottom: 14px; }
+.form-hint { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+.form-row { display: grid; gap: 12px; }
 
-.btn-secondary {
-  background: transparent;
-  color: var(--text);
-  border: 1px solid var(--line-bright);
+/* ── Badges ── */
+.badge { display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.badge-accent  { background: var(--accent-bg); color: var(--accent); }
+.badge-green   { background: var(--green-bg);  color: var(--green); }
+.badge-amber   { background: var(--amber-bg);  color: var(--amber); }
+.badge-red     { background: var(--red-bg);    color: var(--red); }
+.badge-blue    { background: var(--blue-bg);   color: var(--blue); }
+.badge-gray    { background: var(--surface-2); color: var(--text-2); }
+.badge-purple  { background: #f3e8ff; color: #7c3aed; }
+
+/* ── Score Circle ── */
+.score-circle {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; flex-shrink: 0;
 }
+.score-high { background: var(--accent-bg); color: var(--accent); }
+.score-mid  { background: var(--amber-bg);  color: var(--amber); }
+.score-low  { background: var(--surface-2); color: var(--text-3); }
 
-.btn-secondary:hover {
-  background: var(--bg-3);
-  border-color: var(--accent);
-  box-shadow: none;
-  transform: none;
-}
-
-.btn-danger {
-  background: transparent;
-  color: var(--hot);
-  border: 1px solid var(--hot);
-}
-
-.btn-danger:hover {
-  background: var(--hot);
-  color: var(--bg);
-  box-shadow: none;
-  transform: none;
-}
-
-input[type="file"] { display: none; }
-
-/* FILTER ROW */
-.filters {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.filter-group {
-  display: flex;
-  gap: 0;
-  border: 1px solid var(--line);
-  background: var(--bg-2);
-}
-
+/* ── Filters ── */
+.leads-controls { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.search-wrap { flex: 1; min-width: 180px; position: relative; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; font-size: 15px; }
+.search-wrap .input { padding-left: 32px; }
+.filter-strip { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
 .filter-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-dim);
-  padding: 10px 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  border-right: 1px solid var(--line);
-  transition: all 0.1s;
+  padding: 5px 11px; border-radius: var(--r-sm); border: 1px solid var(--border);
+  background: var(--surface); color: var(--text-2); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all .12s; font-family: inherit;
 }
+.filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+.filter-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
 
-.filter-btn:last-child { border-right: none; }
-
-.filter-btn:hover { color: var(--text); }
-
-.filter-btn.active {
-  background: var(--accent);
-  color: var(--bg);
-}
-
-.search {
-  flex: 1;
-  min-width: 200px;
-  background: var(--bg-2);
-  border: 1px solid var(--line);
-  color: var(--text);
-  padding: 10px 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  outline: none;
-}
-
-.search:focus {
-  border-color: var(--accent);
-}
-
-.search::placeholder {
-  color: var(--text-very-dim);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* TABLE */
-.table-wrap {
-  background: var(--bg-2);
-  border: 1px solid var(--line);
-  overflow: hidden;
-}
-
-.table-header {
+/* ── Desktop Table ── */
+.leads-table { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.tbl-head {
   display: grid;
-  grid-template-columns: 60px 80px 2fr 1fr 1fr 100px 1fr 1fr;
-  padding: 14px 20px;
-  background: var(--bg-3);
-  border-bottom: 1px solid var(--line);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--text-dim);
+  grid-template-columns: 52px 110px 1fr 110px 145px 1fr 120px;
+  padding: 9px 16px; background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px; font-weight: 600; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .5px; gap: 8px;
 }
-
-.table-row {
+.tbl-row {
   display: grid;
-  grid-template-columns: 60px 80px 2fr 1fr 1fr 100px 1fr 1fr;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--line);
-  align-items: center;
-  transition: background 0.1s;
-  font-size: 13px;
+  grid-template-columns: 52px 110px 1fr 110px 145px 1fr 120px;
+  padding: 10px 16px; border-bottom: 1px solid var(--border);
+  align-items: center; gap: 8px; transition: background .1s;
 }
-
-.table-row:hover {
-  background: var(--bg-3);
+.tbl-row:last-child { border-bottom: none; }
+.tbl-row:hover { background: #fafbfc; }
+.lead-info .name  { font-weight: 600; font-size: 14px; }
+.lead-info .uname { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+.status-sel {
+  border: 1px solid var(--border); border-radius: var(--r-sm);
+  padding: 5px 7px; font-size: 12px; font-weight: 500;
+  cursor: pointer; outline: none; width: 100%;
+  background: var(--surface); color: var(--text); font-family: inherit;
 }
-
-.table-row:last-child { border-bottom: none; }
-
-.score-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 18px;
-  letter-spacing: 1px;
-  background: var(--bg);
-  color: var(--accent);
-  border: 1px solid var(--line-bright);
+.status-sel:focus { border-color: var(--accent); }
+.ss-not-contacted { color: var(--text-3); }
+.ss-dmed          { color: var(--blue);  border-color: var(--blue); }
+.ss-replied       { color: var(--amber); border-color: var(--amber); }
+.ss-converted     { color: var(--green); border-color: var(--green); }
+.ss-not-interested{ color: var(--text-3); }
+.notes-inp {
+  border: 1px solid transparent; background: transparent;
+  border-radius: var(--r-sm); padding: 5px 7px;
+  font-size: 13px; color: var(--text); width: 100%;
+  outline: none; font-family: inherit;
 }
+.notes-inp:hover { border-color: var(--border); }
+.notes-inp:focus { border-color: var(--accent); background: var(--surface); }
+.notes-inp::placeholder { color: var(--text-3); }
+.row-actions { display: flex; gap: 4px; align-items: center; justify-content: flex-end; }
 
-.score-badge.high {
-  background: var(--accent);
-  color: var(--bg);
-  border-color: var(--accent);
+/* ── Mobile Cards ── */
+.lead-cards { display: none; }
+.lead-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; margin-bottom: 8px; }
+.lc-top  { display: flex; gap: 10px; margin-bottom: 10px; }
+.lc-info { flex: 1; min-width: 0; }
+.lc-name  { font-weight: 600; font-size: 15px; }
+.lc-uname { font-size: 13px; color: var(--text-3); margin-top: 1px; }
+.lc-meta  { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+.lc-bottom { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+
+/* ── Empty State ── */
+.empty-state { padding: 56px 20px; text-align: center; }
+.es-icon  { font-size: 38px; margin-bottom: 12px; }
+.es-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.es-sub   { font-size: 14px; color: var(--text-3); }
+
+/* ── Scrape Progress ── */
+.scrape-progress {
+  background: var(--accent-bg); border: 1px solid #c7d2fe;
+  border-radius: var(--r); padding: 14px 16px; margin-bottom: 14px; display: none;
 }
+.sp-row { display: flex; align-items: center; gap: 8px; }
+.sp-text { font-size: 14px; font-weight: 500; color: var(--accent); }
+.progress-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 2px; animation: pulse-op 1.5s ease-in-out infinite; }
+@keyframes pulse-op { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-.score-badge.mid {
-  color: var(--warm);
-  border-color: var(--warm);
+/* ── Scrape History ── */
+.sh-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.sh-item:last-child { border-bottom: none; }
+.sh-info { flex: 1; min-width: 0; }
+.sh-title { font-weight: 500; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.sh-meta  { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+/* ── Status dots ── */
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.dot-run { background: var(--amber); animation: pulse-op 1s infinite; }
+.dot-ok  { background: var(--green); }
+.dot-err { background: var(--red); }
+
+/* ── Client Cards ── */
+.client-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px; margin-bottom: 10px; transition: border-color .12s; }
+.client-card:hover { border-color: #c7d2fe; }
+.cc-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.cc-name     { font-weight: 600; font-size: 15px; }
+.cc-audience { font-size: 13px; color: var(--text-3); margin-top: 2px; }
+.cc-stats { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+.cc-stat { font-size: 12px; color: var(--text-3); }
+.cc-stat b { color: var(--text); font-weight: 600; margin-right: 2px; }
+
+/* ── Settings ── */
+.key-row { display: flex; gap: 8px; align-items: flex-end; }
+.key-row .input { flex: 1; }
+.key-indicator { display: flex; align-items: center; gap: 6px; margin-top: 7px; font-size: 12px; color: var(--text-3); }
+.key-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-3); }
+.key-dot.set { background: var(--green); }
+
+/* ── DM Modal ── */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(15,23,42,.45);
+  z-index: 200; display: flex; align-items: flex-end;
+  justify-content: center; padding: 16px;
 }
-
-.source-tag {
-  display: inline-block;
-  padding: 4px 8px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border: 1px solid;
+@media (min-width: 600px) { .modal-backdrop { align-items: center; } }
+.modal {
+  background: var(--surface); border-radius: var(--r);
+  width: 100%; max-width: 480px; max-height: 85vh;
+  overflow-y: auto; padding: 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
 }
-
-.source-likes { color: var(--hot); border-color: var(--hot); }
-.source-comments { color: var(--warm); border-color: var(--warm); }
-.source-followers { color: var(--accent); border-color: var(--accent); }
-.source-competitor-likes { color: var(--cool); border-color: var(--cool); }
-.source-competitor-followers { color: #aa66ff; border-color: #aa66ff; }
-.source-competitor-comments { color: #ff66cc; border-color: #ff66cc; }
-
-.lead-name {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.modal-title  { font-size: 16px; font-weight: 600; }
+.dm-box {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 14px; font-size: 14px;
+  line-height: 1.65; white-space: pre-wrap; min-height: 110px; color: var(--text);
 }
+.dm-actions { display: flex; gap: 8px; margin-top: 12px; }
+.dm-status  { font-size: 12px; color: var(--text-3); margin-top: 8px; }
 
-.lead-name .name {
-  font-weight: 600;
-  color: var(--text);
-}
-
-.lead-name .username {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  color: var(--text-dim);
-}
-
-.account-type {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-dim);
-}
-
-.account-type.public { color: var(--converted); }
-.account-type.private { color: var(--text-very-dim); }
-
-.status-select {
-  background: var(--bg);
-  border: 1px solid var(--line);
-  color: var(--text);
-  padding: 6px 10px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  width: 100%;
-  outline: none;
-}
-
-.status-select:focus { border-color: var(--accent); }
-
-.status-not-contacted { color: var(--text-dim); }
-.status-dmed { color: var(--cool); border-color: var(--cool); }
-.status-replied { color: var(--warm); border-color: var(--warm); }
-.status-converted { color: var(--converted); border-color: var(--converted); }
-.status-not-interested { color: var(--text-very-dim); }
-
-.notes-input {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text);
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  padding: 6px 8px;
-  width: 100%;
-  outline: none;
-}
-
-.notes-input:hover, .notes-input:focus {
-  border-color: var(--line-bright);
-  background: var(--bg);
-}
-
-.notes-input::placeholder {
-  color: var(--text-very-dim);
-  font-style: italic;
-}
-
-.action-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--accent);
-  text-decoration: none;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding: 6px 12px;
-  border: 1px solid var(--accent);
-  transition: all 0.1s;
-}
-
-.action-link:hover {
-  background: var(--accent);
-  color: var(--bg);
-}
-
-/* EMPTY STATE */
-.empty {
-  padding: 80px 40px;
-  text-align: center;
-  color: var(--text-dim);
-}
-
-.empty h3 {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 32px;
-  letter-spacing: 2px;
-  color: var(--text);
-  margin-bottom: 8px;
-}
-
-.empty p {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-}
-
-/* TOAST */
+/* ── Toast ── */
 .toast {
-  position: fixed;
-  bottom: 32px;
-  right: 32px;
-  background: var(--accent);
-  color: var(--bg);
-  padding: 14px 24px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  border: 2px solid var(--text);
-  z-index: 100;
-  animation: slideIn 0.2s;
+  position: fixed; bottom: 20px; right: 20px; padding: 10px 16px;
+  border-radius: var(--r-sm); font-size: 14px; font-weight: 500;
+  z-index: 300; max-width: 320px; animation: toast-in .18s ease-out;
 }
+@keyframes toast-in { from { transform: translateY(6px); opacity: 0; } to { transform: none; opacity: 1; } }
+.toast-default { background: var(--text); color: #fff; }
+.toast-success  { background: #064e3b; color: #fff; }
+.toast-error    { background: #7f1d1d; color: #fff; }
 
-@keyframes slideIn {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+/* ── Helpers ── */
+.divider      { height: 1px; background: var(--border); margin: 18px 0; }
+.section-title { font-size: 12px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px; }
+.link { color: var(--accent); text-decoration: none; font-weight: 500; }
+.link:hover { text-decoration: underline; }
+.two-col     { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.sidebar-col { display: grid; grid-template-columns: 320px 1fr; gap: 20px; }
+
+/* ── Responsive ── */
+@media (max-width: 820px) {
+  .leads-table { display: none; }
+  .lead-cards  { display: block; }
+  .two-col     { grid-template-columns: 1fr; }
+  .sidebar-col { grid-template-columns: 1fr; }
+  .header-stats { display: none; }
 }
-
-/* DELETE BUTTON */
-.delete-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-very-dim);
-  cursor: pointer;
-  font-size: 16px;
-  padding: 4px 8px;
-  transition: color 0.1s;
+@media (max-width: 500px) {
+  .app-content { padding: 14px 12px 60px; }
 }
-
-.delete-btn:hover {
-  color: var(--hot);
-}
-
-/* RESPONSIVE */
-@media (max-width: 1100px) {
-  .table-header, .table-row {
-    grid-template-columns: 50px 70px 2fr 1fr 100px 1fr;
-  }
-  .col-account, .col-notes {
-    display: none;
-  }
-}
-
-@media (max-width: 700px) {
-  .app { padding: 16px; }
-  .brand h1 { font-size: 36px; }
-  .control-bar { grid-template-columns: 1fr; }
-  .table-header, .table-row {
-    grid-template-columns: 1fr 80px;
-    gap: 8px;
-  }
-  .col-score, .col-source, .col-account, .col-status-header { display: none; }
-}
-
-footer {
-  margin-top: 48px;
-  padding: 24px 0;
-  border-top: 1px solid var(--line);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: var(--text-very-dim);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  text-align: center;
-}
-
-footer span { color: var(--accent); }
 </style>
 </head>
 <body>
 
-<div class="app">
-  <header>
+<!-- ══ HEADER ══ -->
+<header class="app-header">
+  <div class="header-inner">
     <div class="brand">
-      <h1>LEAD <span>PIPELINE</span></h1>
-      <p>// jackedbyjack outreach console</p>
+      <div class="brand-mark">J</div>
+      <div class="brand-name">Jacked<span>ByJack</span></div>
     </div>
     <div class="header-stats">
-      <div class="stat-pill">
-        <div class="num" id="stat-total">0</div>
-        <div class="label">Total Leads</div>
-      </div>
-      <div class="stat-pill">
-        <div class="num" id="stat-untouched">0</div>
-        <div class="label">To DM</div>
-      </div>
-      <div class="stat-pill">
-        <div class="num" id="stat-replied">0</div>
-        <div class="label">Replied</div>
-      </div>
-      <div class="stat-pill">
-        <div class="num" id="stat-converted">0</div>
-        <div class="label">Converted</div>
-      </div>
+      <div class="h-stat"><div class="h-stat-num" id="stat-total">0</div><div class="h-stat-lbl">Total</div></div>
+      <div class="h-stat"><div class="h-stat-num" id="stat-todm">0</div><div class="h-stat-lbl">To DM</div></div>
+      <div class="h-stat"><div class="h-stat-num" id="stat-replied">0</div><div class="h-stat-lbl">Replied</div></div>
+      <div class="h-stat"><div class="h-stat-num" id="stat-converted">0</div><div class="h-stat-lbl">Converted</div></div>
     </div>
-  </header>
+    <button class="btn btn-primary btn-sm" id="hdr-new-scrape">+ New Scrape</button>
+  </div>
+</header>
 
-  <div class="control-bar">
-    <label class="upload-zone" for="csv-input">
-      <div class="icon">+</div>
-      <div class="text">
-        <div class="text-main">Upload Apify CSV</div>
-        <div class="text-sub">// drag your scraped lead file here or click to browse</div>
-      </div>
+<!-- ══ NAV ══ -->
+<nav class="app-nav">
+  <div class="nav-inner">
+    <button class="nav-tab active" data-tab="leads">Leads</button>
+    <button class="nav-tab" data-tab="scrape">Scrape</button>
+    <button class="nav-tab" data-tab="clients">Clients</button>
+    <button class="nav-tab" data-tab="settings">Settings</button>
+  </div>
+</nav>
+
+<main class="app-content">
+
+<!-- ══ LEADS TAB ══ -->
+<div class="tab-panel active" id="tab-leads">
+  <div class="leads-controls">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" class="input" id="search" placeholder="Search name or @username…">
+    </div>
+    <label class="btn btn-secondary btn-sm" for="csv-input" title="Upload Apify CSV (fallback)">
+      ↑ CSV
       <input type="file" id="csv-input" accept=".csv" multiple>
     </label>
-    <select class="source-select" id="source-select">
-      <option value="my-likes">My Post Likes</option>
-      <option value="my-comments">My Post Comments</option>
+    <select class="input" id="csv-source-sel" style="width:auto;max-width:160px;">
+      <option value="my-likes">My Likes</option>
+      <option value="my-comments">My Comments</option>
       <option value="my-followers">My Followers</option>
-      <option value="competitor-likes">Competitor Likes</option>
-      <option value="competitor-comments">Competitor Comments</option>
-      <option value="competitor-followers">Competitor Followers</option>
+      <option value="my-following">My Following</option>
+      <option value="competitor-likes">Comp. Likes</option>
+      <option value="competitor-comments">Comp. Comments</option>
+      <option value="competitor-followers">Comp. Followers</option>
+      <option value="competitor-following">Comp. Following</option>
     </select>
-    <button class="btn btn-danger" id="clear-all">Wipe All</button>
+    <button class="btn btn-danger btn-sm" id="btn-clear-leads">Clear All</button>
   </div>
 
-  <div class="filters">
-    <div class="filter-group" id="status-filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="not-contacted">Not Contacted</button>
-      <button class="filter-btn" data-filter="dmed">DMed</button>
-      <button class="filter-btn" data-filter="replied">Replied</button>
-      <button class="filter-btn" data-filter="converted">Converted</button>
-    </div>
-    <div class="filter-group" id="source-filters">
-      <button class="filter-btn active" data-source="all">All Sources</button>
-      <button class="filter-btn" data-source="my-likes">My Likes</button>
-      <button class="filter-btn" data-source="my-comments">My Comments</button>
-      <button class="filter-btn" data-source="my-followers">My Followers</button>
-      <button class="filter-btn" data-source="competitor-likes">Comp. Likes</button>
-      <button class="filter-btn" data-source="competitor-followers">Comp. Followers</button>
-    </div>
-    <input type="text" class="search" id="search" placeholder="Search name or username...">
+  <div class="filter-strip" id="status-filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="not-contacted">Not Contacted</button>
+    <button class="filter-btn" data-filter="dmed">DMed</button>
+    <button class="filter-btn" data-filter="replied">Replied</button>
+    <button class="filter-btn" data-filter="converted">Converted</button>
   </div>
 
-  <div class="table-wrap">
-    <div class="table-header">
-      <div class="col-score">Score</div>
-      <div class="col-source">Source</div>
-      <div>Lead</div>
-      <div class="col-account">Account</div>
-      <div class="col-status-header">Status</div>
-      <div></div>
-      <div class="col-notes">Notes</div>
-      <div></div>
-    </div>
-    <div id="leads-list"></div>
+  <div class="filter-strip" id="source-filters">
+    <button class="filter-btn active" data-source="all">All Sources</button>
+    <button class="filter-btn" data-source="my-likes">My Likes</button>
+    <button class="filter-btn" data-source="my-comments">My Comments</button>
+    <button class="filter-btn" data-source="my-followers">My Followers</button>
+    <button class="filter-btn" data-source="competitor-likes">Comp. Likes</button>
+    <button class="filter-btn" data-source="competitor-followers">Comp. Followers</button>
   </div>
 
-  <footer>
-    SYSTEM <span>ONLINE</span> // BUILT BY JACK FOR JACK
-  </footer>
+  <div class="filter-strip" id="client-filter-strip" style="display:none;"></div>
+
+  <div class="leads-table">
+    <div class="tbl-head">
+      <div>Score</div><div>Source</div><div>Lead</div>
+      <div>Client</div><div>Status</div><div>Notes</div><div></div>
+    </div>
+    <div id="leads-desktop"></div>
+  </div>
+  <div class="lead-cards" id="leads-mobile"></div>
+</div>
+
+<!-- ══ SCRAPE TAB ══ -->
+<div class="tab-panel" id="tab-scrape">
+  <div class="two-col">
+
+    <div class="card">
+      <div style="margin-bottom:18px;">
+        <div class="card-title">New Scrape</div>
+        <div class="card-sub">Pull leads from Instagram via Apify — no manual CSV needed</div>
+      </div>
+
+      <div class="form-row" style="grid-template-columns:1fr 1fr;">
+        <div class="form-group">
+          <label class="form-label">Scrape Type</label>
+          <select class="input" id="scrape-type">
+            <option value="post-likes">Post Likes</option>
+            <option value="post-comments">Post Commenters</option>
+            <option value="profile-followers">Profile Followers</option>
+            <option value="profile-following">Profile Following</option>
+            <option value="hashtag">Hashtag Engagers</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Source Category</label>
+          <select class="input" id="scrape-source">
+            <option value="my-likes">My Likes</option>
+            <option value="my-comments">My Comments</option>
+            <option value="my-followers">My Followers</option>
+            <option value="my-following">My Following</option>
+            <option value="competitor-likes">Comp. Likes</option>
+            <option value="competitor-comments">Comp. Comments</option>
+            <option value="competitor-followers">Comp. Followers</option>
+            <option value="competitor-following">Comp. Following</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" id="target-lbl">Post URL</label>
+        <input type="text" class="input" id="scrape-target" placeholder="https://www.instagram.com/p/…">
+        <div class="form-hint" id="target-hint">Paste the full Instagram post URL</div>
+      </div>
+
+      <div class="form-row" style="grid-template-columns:1fr 1fr;">
+        <div class="form-group">
+          <label class="form-label">Max Results</label>
+          <input type="number" class="input" id="scrape-max" value="1000" min="10" max="10000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Tag</label>
+          <select class="input" id="scrape-client-tag">
+            <option value="">Personal</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="scrape-progress" id="scrape-progress">
+        <div class="sp-row">
+          <div class="dot dot-run"></div>
+          <span class="sp-text" id="sp-text">Starting…</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-start-scrape" style="width:100%;">Start Scrape</button>
+
+      <div class="divider"></div>
+      <p style="font-size:12px;color:var(--text-3);">
+        No Apify token yet? <a class="link" href="#" id="go-settings-link">Add it in Settings →</a>
+      </p>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <div class="card-title">Scrape History</div>
+          <div class="card-sub">Click Re-run to pre-fill the form</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btn-clear-history">Clear</button>
+      </div>
+      <div id="scrape-history-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ CLIENTS TAB ══ -->
+<div class="tab-panel" id="tab-clients">
+  <div class="sidebar-col">
+    <div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px;">Add Client</div>
+        <div class="form-group">
+          <label class="form-label">Client Name *</label>
+          <input type="text" class="input" id="cl-name" placeholder="e.g. Mike's Gym">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Target Audience</label>
+          <input type="text" class="input" id="cl-audience" placeholder="e.g. 18–35 fitness beginners">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <input type="text" class="input" id="cl-notes" placeholder="Any notes…">
+        </div>
+        <button class="btn btn-primary" id="btn-add-client" style="width:100%;">Add Client</button>
+      </div>
+    </div>
+    <div>
+      <div class="section-title">Your Clients</div>
+      <div id="clients-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS TAB ══ -->
+<div class="tab-panel" id="tab-settings">
+  <div style="max-width:540px;">
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title">Apify API Token</div>
+      <div class="card-sub" style="margin-bottom:14px;">Used to start scrapes and fetch results</div>
+      <div class="key-row">
+        <input type="password" class="input" id="apify-token-inp" placeholder="apify_api_…" autocomplete="new-password">
+        <button class="btn btn-secondary btn-sm" id="btn-save-apify">Save</button>
+      </div>
+      <div class="key-indicator">
+        <span class="key-dot" id="apify-dot"></span>
+        <span id="apify-status-txt">Not set</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title">Claude API Key</div>
+      <div class="card-sub" style="margin-bottom:14px;">Used to generate personalised DMs (stored locally only)</div>
+      <div class="key-row">
+        <input type="password" class="input" id="claude-key-inp" placeholder="sk-ant-…" autocomplete="new-password">
+        <button class="btn btn-secondary btn-sm" id="btn-save-claude">Save</button>
+      </div>
+      <div class="key-indicator">
+        <span class="key-dot" id="claude-dot"></span>
+        <span id="claude-status-txt">Not set</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title">Apify Actor IDs</div>
+      <div class="card-sub" style="margin-bottom:14px;">Swap actors for each scrape type as needed</div>
+      <div class="form-group">
+        <label class="form-label">Post Likes</label>
+        <input type="text" class="input actor-inp" data-key="likes" placeholder="datadoping/instagram-likes-scraper">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Post Comments</label>
+        <input type="text" class="input actor-inp" data-key="comments" placeholder="apify/instagram-comment-scraper">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Profile Followers</label>
+        <input type="text" class="input actor-inp" data-key="followers" placeholder="apify/instagram-scraper">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Profile Following</label>
+        <input type="text" class="input actor-inp" data-key="following" placeholder="apify/instagram-scraper">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hashtag</label>
+        <input type="text" class="input actor-inp" data-key="hashtag" placeholder="apify/instagram-hashtag-scraper">
+      </div>
+      <button class="btn btn-primary btn-sm" id="btn-save-actors">Save Actor IDs</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="color:var(--red);margin-bottom:4px;">Danger Zone</div>
+      <div class="card-sub" style="margin-bottom:14px;">These actions cannot be undone</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-danger btn-sm" id="btn-wipe-leads">Delete All Leads</button>
+        <button class="btn btn-danger btn-sm" id="btn-wipe-settings">Clear All Settings &amp; Keys</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</main>
+
+<!-- ══ DM MODAL ══ -->
+<div class="modal-backdrop" id="dm-modal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">AI DM Generator</div>
+      <button class="btn btn-ghost btn-sm" id="btn-close-modal">✕</button>
+    </div>
+    <div id="dm-lead-info" style="font-size:13px;color:var(--text-2);margin-bottom:12px;"></div>
+    <div class="dm-box" id="dm-box">Click Generate to create a personalised opening message.</div>
+    <div class="dm-actions">
+      <button class="btn btn-primary" id="btn-gen-dm" style="flex:1;">✦ Generate</button>
+      <button class="btn btn-secondary" id="btn-copy-dm">Copy</button>
+      <button class="btn btn-ghost" id="btn-regen-dm" title="Regenerate">↻</button>
+    </div>
+    <div class="dm-status" id="dm-status"></div>
+  </div>
 </div>
 
 <script>
-// ============= STATE =============
-let leads = [];
-let currentStatusFilter = 'all';
-let currentSourceFilter = 'all';
-let currentSearch = '';
+'use strict';
 
-// ============= STORAGE =============
-// Use localStorage as primary (works in regular browsers and on Netlify)
-// Fall back to window.storage if available (Claude artifacts environment)
-
-async function saveLeads() {
-  const data = JSON.stringify(leads);
-  // Try localStorage first - most reliable in browsers
-  try {
-    localStorage.setItem('jbj-leads-data', data);
-    return;
-  } catch (e) {
-    console.log('localStorage unavailable, trying window.storage');
+// ── STATE ──
+let leads = [], clients = [], scrapeHistory = [];
+let settings = {
+  apifyToken: '', claudeApiKey: '',
+  actors: {
+    likes:     'datadoping/instagram-likes-scraper',
+    comments:  'apify/instagram-comment-scraper',
+    followers: 'apify/instagram-scraper',
+    following: 'apify/instagram-scraper',
+    hashtag:   'apify/instagram-hashtag-scraper'
   }
-  // Fall back to window.storage if it exists
-  if (typeof window.storage !== 'undefined') {
-    try {
-      await window.storage.set('jbj-leads-data', data);
-    } catch (e) {
-      console.error('Storage save failed:', e);
-    }
-  }
-}
+};
+let currentStatusFilter = 'all', currentSourceFilter = 'all';
+let currentClientFilter = 'all', currentSearch = '';
+let currentDMLead = null;
+const activePolls = {};
 
-async function loadLeads() {
-  // Try localStorage first
-  try {
-    const data = localStorage.getItem('jbj-leads-data');
-    if (data) {
-      leads = JSON.parse(data);
-      render();
-      return;
-    }
-  } catch (e) {
-    console.log('localStorage read failed, trying window.storage');
-  }
-  // Fall back to window.storage
-  if (typeof window.storage !== 'undefined') {
-    try {
-      const result = await window.storage.get('jbj-leads-data');
-      if (result && result.value) {
-        leads = JSON.parse(result.value);
-      }
-    } catch (e) {
-      console.log('No saved leads yet');
-      leads = [];
-    }
-  }
-  render();
-}
+// ── CONSTANTS ──
+const SOURCE_LABELS = {
+  'my-likes':'My Likes','my-comments':'My Comments','my-followers':'My Followers',
+  'my-following':'My Following','competitor-likes':'Comp. Likes',
+  'competitor-comments':'Comp. Comments','competitor-followers':'Comp. Followers',
+  'competitor-following':'Comp. Following'
+};
+const SOURCE_BADGE = {
+  'my-likes':'badge-red','my-comments':'badge-amber','my-followers':'badge-green',
+  'my-following':'badge-blue','competitor-likes':'badge-accent',
+  'competitor-comments':'badge-purple','competitor-followers':'badge-gray',
+  'competitor-following':'badge-gray'
+};
+const STATUS_LABELS = {
+  'not-contacted':'Not Contacted','dmed':'DMed','replied':'Replied',
+  'converted':'Converted','not-interested':'Not Interested'
+};
+const SCRAPE_TYPE_LABELS = {
+  'post-likes':'Post Likes','post-comments':'Post Comments',
+  'profile-followers':'Followers','profile-following':'Following','hashtag':'Hashtag'
+};
+const DEFAULT_ACTORS = {
+  likes:'datadoping/instagram-likes-scraper', comments:'apify/instagram-comment-scraper',
+  followers:'apify/instagram-scraper', following:'apify/instagram-scraper',
+  hashtag:'apify/instagram-hashtag-scraper'
+};
+const SCRAPE_HINTS = {
+  'post-likes':        ['Post URL',  'https://www.instagram.com/p/Cxxxxxxx/'],
+  'post-comments':     ['Post URL',  'https://www.instagram.com/p/Cxxxxxxx/'],
+  'profile-followers': ['Username',  'jackedbyjack'],
+  'profile-following': ['Username',  'jackedbyjack'],
+  'hashtag':           ['Hashtag',   'fitness  (no # needed)']
+};
 
-// ============= CSV PARSING =============
-function parseCSV(text) {
-  const lines = text.split(/\r?\n/).filter(l => l.trim());
-  if (lines.length < 2) return [];
+// ── STORAGE ──
+const LS = {
+  set(k,v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(_){} },
+  get(k,fb){ try { const d=localStorage.getItem(k); return d?JSON.parse(d):fb; } catch(_){ return fb; } }
+};
 
-  // Parse header
-  const headers = parseCSVLine(lines[0]).map(h => h.trim().replace(/^\uFEFF/, ''));
+// ── UTILS ──
+function q(id)    { return document.getElementById(id); }
+function esc(s)   { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function stamp()  { return new Date().toISOString().slice(0,10); }
+function findLead(id) { return leads.find(l => l.id === parseFloat(id)); }
 
-  const rows = [];
-  for (let i = 1; i < lines.length; i++) {
-    const values = parseCSVLine(lines[i]);
-    if (values.length === 0) continue;
-    const row = {};
-    headers.forEach((h, idx) => {
-      row[h] = (values[idx] || '').trim();
-    });
-    rows.push(row);
-  }
-  return rows;
-}
-
-function parseCSVLine(line) {
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') {
-      if (inQuotes && line[i+1] === '"') {
-        current += '"';
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
-    } else if (c === ',' && !inQuotes) {
-      result.push(current);
-      current = '';
-    } else {
-      current += c;
-    }
-  }
-  result.push(current);
-  return result;
-}
-
-// ============= SCORING =============
-function scoreLead(lead) {
-  let score = 0;
-  const username = (lead.username || '').toLowerCase();
-  const fullName = (lead.full_name || '').trim();
-
-  // Source priority - your audience is warmer
-  const sourceScores = {
-    'my-followers': 5,
-    'my-comments': 4,
-    'my-likes': 3,
-    'competitor-comments': 3,
-    'competitor-followers': 2,
-    'competitor-likes': 1
-  };
-  score += sourceScores[lead.source] || 0;
-
-  // Public account (can see content, easier to personalise)
-  if (lead.is_private === 'false' || lead.is_private === false) score += 2;
-
-  // Has real name
-  if (fullName && fullName.toLowerCase() !== username && fullName.length > 1) score += 2;
-
-  // Username quality (less digits = more likely real person)
-  const digitCount = (username.match(/\d/g) || []).length;
-  if (digitCount === 0) score += 2;
-  else if (digitCount < 3) score += 1;
-
-  // Username structure looks human
-  const cleanUsername = username.replace(/[._]/g, '');
-  if (/^[a-z]+$/.test(cleanUsername)) score += 1;
-
-  return Math.min(score, 10);
-}
-
-// ============= UPLOAD =============
-document.getElementById('csv-input').addEventListener('change', async (e) => {
-  const files = Array.from(e.target.files);
-  const source = document.getElementById('source-select').value;
-
-  let totalAdded = 0;
-  let totalDuplicates = 0;
-
-  for (const file of files) {
-    const text = await file.text();
-    const rows = parseCSV(text);
-
-    for (const row of rows) {
-      const username = row.username || row.Username || '';
-      if (!username) continue;
-
-      // Check for duplicate
-      const existing = leads.find(l => l.username === username);
-      if (existing) {
-        totalDuplicates++;
-        // If new source is higher priority, update source
-        const sourceRank = {
-          'my-followers': 6, 'my-comments': 5, 'my-likes': 4,
-          'competitor-comments': 3, 'competitor-followers': 2, 'competitor-likes': 1
-        };
-        if ((sourceRank[source] || 0) > (sourceRank[existing.source] || 0)) {
-          existing.source = source;
-          existing.score = scoreLead(existing);
-        }
-        continue;
-      }
-
-      const lead = {
-        id: Date.now() + Math.random(),
-        username: username,
-        full_name: row.full_name || row['full_name'] || '',
-        is_private: row.is_private || 'false',
-        is_verified: row.is_verified || 'false',
-        source: source,
-        status: 'not-contacted',
-        notes: '',
-        added_at: new Date().toISOString()
-      };
-      lead.score = scoreLead(lead);
-      leads.push(lead);
-      totalAdded++;
-    }
-  }
-
-  // Sort by score descending
-  leads.sort((a, b) => b.score - a.score);
-
-  await saveLeads();
-  render();
-  e.target.value = '';
-
-  showToast(`+${totalAdded} added${totalDuplicates ? ` (${totalDuplicates} dupes)` : ''}`);
-});
-
-// ============= FILTERS =============
-document.getElementById('status-filters').addEventListener('click', (e) => {
-  if (!e.target.classList.contains('filter-btn')) return;
-  document.querySelectorAll('#status-filters .filter-btn').forEach(b => b.classList.remove('active'));
-  e.target.classList.add('active');
-  currentStatusFilter = e.target.dataset.filter;
-  render();
-});
-
-document.getElementById('source-filters').addEventListener('click', (e) => {
-  if (!e.target.classList.contains('filter-btn')) return;
-  document.querySelectorAll('#source-filters .filter-btn').forEach(b => b.classList.remove('active'));
-  e.target.classList.add('active');
-  currentSourceFilter = e.target.dataset.source;
-  render();
-});
-
-document.getElementById('search').addEventListener('input', (e) => {
-  currentSearch = e.target.value.toLowerCase();
-  render();
-});
-
-// ============= CLEAR ALL =============
-document.getElementById('clear-all').addEventListener('click', async () => {
-  if (!confirm('Wipe all leads? This cannot be undone.')) return;
-  leads = [];
-  await saveLeads();
-  render();
-  showToast('All leads wiped');
-});
-
-// ============= RENDER =============
-function render() {
-  // Stats
-  document.getElementById('stat-total').textContent = leads.length;
-  document.getElementById('stat-untouched').textContent = leads.filter(l => l.status === 'not-contacted').length;
-  document.getElementById('stat-replied').textContent = leads.filter(l => l.status === 'replied').length;
-  document.getElementById('stat-converted').textContent = leads.filter(l => l.status === 'converted').length;
-
-  // Filter
-  let filtered = leads;
-  if (currentStatusFilter !== 'all') {
-    filtered = filtered.filter(l => l.status === currentStatusFilter);
-  }
-  if (currentSourceFilter !== 'all') {
-    filtered = filtered.filter(l => l.source === currentSourceFilter);
-  }
-  if (currentSearch) {
-    filtered = filtered.filter(l =>
-      l.username.toLowerCase().includes(currentSearch) ||
-      l.full_name.toLowerCase().includes(currentSearch)
-    );
-  }
-
-  const list = document.getElementById('leads-list');
-
-  if (filtered.length === 0) {
-    list.innerHTML = `
-      <div class="empty">
-        <h3>${leads.length === 0 ? 'NO LEADS YET' : 'NO MATCHES'}</h3>
-        <p>${leads.length === 0 ? '// upload your first apify csv to get started' : '// try different filters'}</p>
-      </div>
-    `;
-    return;
-  }
-
-  list.innerHTML = filtered.map(lead => renderRow(lead)).join('');
-
-  // Attach handlers
-  list.querySelectorAll('.status-select').forEach(sel => {
-    sel.addEventListener('change', async (e) => {
-      const id = parseFloat(e.target.dataset.id);
-      const lead = leads.find(l => l.id === id);
-      if (lead) {
-        lead.status = e.target.value;
-        await saveLeads();
-        render();
-      }
-    });
-  });
-
-  list.querySelectorAll('.notes-input').forEach(input => {
-    input.addEventListener('change', async (e) => {
-      const id = parseFloat(e.target.dataset.id);
-      const lead = leads.find(l => l.id === id);
-      if (lead) {
-        lead.notes = e.target.value;
-        await saveLeads();
-      }
-    });
-  });
-
-  list.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const id = parseFloat(e.target.dataset.id);
-      leads = leads.filter(l => l.id !== id);
-      await saveLeads();
-      render();
-    });
-  });
-}
-
-function renderRow(lead) {
-  const scoreClass = lead.score >= 8 ? 'high' : lead.score >= 5 ? 'mid' : '';
-  const sourceClass = `source-${lead.source}`;
-  const sourceLabel = {
-    'my-likes': 'My Likes',
-    'my-comments': 'My Comm.',
-    'my-followers': 'My Foll.',
-    'competitor-likes': 'Comp. Lk',
-    'competitor-comments': 'Comp. Cm',
-    'competitor-followers': 'Comp. Fl'
-  }[lead.source] || lead.source;
-
-  const isPrivate = lead.is_private === 'true' || lead.is_private === true;
-  const accountClass = isPrivate ? 'private' : 'public';
-  const accountLabel = isPrivate ? 'PRIVATE' : 'PUBLIC';
-
-  const profileUrl = `https://instagram.com/${lead.username}`;
-  const escName = (lead.full_name || lead.username).replace(/"/g, '&quot;').replace(/</g, '&lt;');
-  const escUsername = lead.username.replace(/"/g, '&quot;').replace(/</g, '&lt;');
-  const escNotes = (lead.notes || '').replace(/"/g, '&quot;');
-
-  return `
-    <div class="table-row" data-id="${lead.id}">
-      <div class="col-score"><div class="score-badge ${scoreClass}">${lead.score}</div></div>
-      <div class="col-source"><span class="source-tag ${sourceClass}">${sourceLabel}</span></div>
-      <div class="lead-name">
-        <div class="name">${escName || '—'}</div>
-        <div class="username">@${escUsername}</div>
-      </div>
-      <div class="col-account"><span class="account-type ${accountClass}">${accountLabel}</span></div>
-      <div class="col-status-header"></div>
-      <div>
-        <select class="status-select status-${lead.status}" data-id="${lead.id}">
-          <option value="not-contacted" ${lead.status==='not-contacted'?'selected':''}>Not Contacted</option>
-          <option value="dmed" ${lead.status==='dmed'?'selected':''}>DMed</option>
-          <option value="replied" ${lead.status==='replied'?'selected':''}>Replied</option>
-          <option value="converted" ${lead.status==='converted'?'selected':''}>Converted</option>
-          <option value="not-interested" ${lead.status==='not-interested'?'selected':''}>Not Interested</option>
-        </select>
-      </div>
-      <div class="col-notes">
-        <input type="text" class="notes-input" data-id="${lead.id}" value="${escNotes}" placeholder="add notes...">
-      </div>
-      <div style="display:flex; gap:8px; align-items:center; justify-content:flex-end;">
-        <a href="${profileUrl}" target="_blank" class="action-link">DM →</a>
-        <button class="delete-btn" data-id="${lead.id}" title="Delete">×</button>
-      </div>
-    </div>
-  `;
-}
-
-// ============= TOAST =============
-function showToast(msg) {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-  const t = document.createElement('div');
-  t.className = 'toast';
-  t.textContent = msg;
+function toast(msg, type='default') {
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t = Object.assign(document.createElement('div'),
+    {className:`toast toast-${type}`, textContent:msg});
   document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
+  setTimeout(()=>t.remove(), 3500);
 }
 
-// ============= INIT =============
-loadLeads();
-</script>
+// ── SCORING ──
+function scoreLead(lead) {
+  let s = 0;
+  const u = (lead.username||'').toLowerCase();
+  const n = (lead.full_name||'').trim();
+  const src = {'my-followers':5,'my-comments':4,'my-likes':3,'my-following':2,
+    'competitor-comments':3,'competitor-followers':2,'competitor-likes':1,'competitor-following':1};
+  s += src[lead.source] || 0;
+  if (!lead.is_private) s += 2;
+  if (n && n.toLowerCase()!==u && n.length>1) s += 2;
+  const digits = (u.match(/\d/g)||[]).length;
+  if (digits===0) s+=2; else if (digits<3) s+=1;
+  if (/^[a-z]+$/.test(u.replace(/[._]/g,''))) s+=1;
+  return Math.min(s, 10);
+}
+function scoreClass(s) { return s>=8?'score-high':s>=5?'score-mid':'score-low'; }
 
+// ── CSV PARSE ──
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/).filter(l=>l.trim());
+  if (lines.length<2) return [];
+  const headers = parseLine(lines[0]).map(h=>h.trim().replace(/^﻿/,''));
+  return lines.slice(1).map(l=>{
+    const vals=parseLine(l); const row={};
+    headers.forEach((h,i)=>{ row[h]=(vals[i]||'').trim(); });
+    return row;
+  }).filter(r=>Object.values(r).some(v=>v));
+}
+function parseLine(line) {
+  const out=[]; let cur='',q=false;
+  for (let i=0;i<line.length;i++) {
+    const c=line[i];
+    if (c==='"') { if (q&&line[i+1]==='"'){cur+='"';i++;} else q=!q; }
+    else if (c===','&&!q) { out.push(cur); cur=''; }
+    else cur+=c;
+  }
+  out.push(cur); return out;
+}
+
+// ── INGEST (CSV rows or Apify items) ──
+function extractUsername(item) {
+  return item.username||item.ownerUsername||item.author?.username||
+         item.user?.username||item.owner?.username||item.Username||'';
+}
+function extractFullName(item) {
+  return item.fullName||item.full_name||item.name||
+         item.owner?.fullName||item.user?.fullName||item.author?.fullName||'';
+}
+function extractIsPrivate(item) {
+  const v = item.isPrivate!==undefined?item.isPrivate:
+            item.private!==undefined?item.private:
+            item.is_private!==undefined?item.is_private:false;
+  return v===true||v==='true';
+}
+
+function ingestLeads(items, source, clientId='') {
+  let added=0, dupes=0;
+  const srcRank={'my-followers':6,'my-comments':5,'my-likes':4,'my-following':3,
+    'competitor-comments':3,'competitor-followers':2,'competitor-likes':1,'competitor-following':1};
+  for (const item of items) {
+    const username = extractUsername(item);
+    if (!username) continue;
+    const existing = leads.find(l=>l.username===username);
+    if (existing) {
+      dupes++;
+      if ((srcRank[source]||0)>(srcRank[existing.source]||0)) {
+        existing.source=source; existing.score=scoreLead(existing);
+      }
+      if (clientId&&!existing.clientId) existing.clientId=clientId;
+      continue;
+    }
+    const lead = {
+      id: Date.now()+Math.random(), username,
+      full_name: extractFullName(item),
+      is_private: extractIsPrivate(item),
+      source, status:'not-contacted',
+      notes:'', clientId:clientId||'',
+      added_at:new Date().toISOString(), dm:''
+    };
+    lead.score = scoreLead(lead);
+    leads.push(lead); added++;
+  }
+  leads.sort((a,b)=>b.score-a.score);
+  LS.set('jbj-leads', leads);
+  return {added, dupes};
+}
+
+// ── RENDER ALL ──
+function renderAll() {
+  updateStats(); renderLeads(); renderClientFilterStrip();
+  renderClients(); renderScrapeHistory();
+}
+
+function updateStats() {
+  q('stat-total').textContent     = leads.length;
+  q('stat-todm').textContent      = leads.filter(l=>l.status==='not-contacted').length;
+  q('stat-replied').textContent   = leads.filter(l=>l.status==='replied').length;
+  q('stat-converted').textContent = leads.filter(l=>l.status==='converted').length;
+}
+
+// ── LEADS RENDER ──
+function getFiltered() {
+  let f = leads;
+  if (currentStatusFilter!=='all') f=f.filter(l=>l.status===currentStatusFilter);
+  if (currentSourceFilter!=='all') f=f.filter(l=>l.source===currentSourceFilter);
+  if (currentClientFilter==='__personal__') f=f.filter(l=>!l.clientId);
+  else if (currentClientFilter!=='all') f=f.filter(l=>l.clientId===currentClientFilter);
+  if (currentSearch) {
+    const s=currentSearch;
+    f=f.filter(l=>(l.username||'').toLowerCase().includes(s)||(l.full_name||'').toLowerCase().includes(s));
+  }
+  return f;
+}
+
+function renderLeads() {
+  updateStats();
+  const filtered = getFiltered();
+  const dEl = q('leads-desktop'), mEl = q('leads-mobile');
+  if (!filtered.length) {
+    const e=emptyHTML(); dEl.innerHTML=e; mEl.innerHTML=e; return;
+  }
+  dEl.innerHTML = filtered.map(desktopRow).join('');
+  mEl.innerHTML = filtered.map(mobileCard).join('');
+  attachLeadHandlers(dEl);
+  attachLeadHandlers(mEl);
+}
+
+function emptyHTML() {
+  const none = leads.length===0;
+  return `<div class="empty-state">
+    <div class="es-icon">${none?'📥':'🔍'}</div>
+    <div class="es-title">${none?'No leads yet':'No matches'}</div>
+    <div class="es-sub">${none?'Upload a CSV or start a scrape to import leads.':'Try adjusting your filters.'}</div>
+  </div>`;
+}
+
+function clientBadge(clientId) {
+  if (!clientId) return '<span class="badge badge-gray">Personal</span>';
+  const c = clients.find(c=>c.id===clientId);
+  return c?`<span class="badge badge-accent">${esc(c.name)}</span>`:'<span class="badge badge-gray">—</span>';
+}
+
+function statusOptions(current) {
+  return Object.entries(STATUS_LABELS)
+    .map(([v,l])=>`<option value="${v}"${v===current?' selected':''}>${l}</option>`).join('');
+}
+
+function desktopRow(lead) {
+  const eu=esc(lead.username), en=esc(lead.full_name||lead.username), en2=esc(lead.notes||'');
+  return `<div class="tbl-row" data-id="${lead.id}">
+    <div><div class="score-circle ${scoreClass(lead.score)}">${lead.score}</div></div>
+    <div><span class="badge ${SOURCE_BADGE[lead.source]||'badge-gray'}">${SOURCE_LABELS[lead.source]||lead.source}</span></div>
+    <div class="lead-info"><div class="name">${en}</div><div class="uname">@${eu}</div></div>
+    <div>${clientBadge(lead.clientId)}</div>
+    <div><select class="status-sel ss-${lead.status}" data-id="${lead.id}">${statusOptions(lead.status)}</select></div>
+    <div><input type="text" class="notes-inp" data-id="${lead.id}" value="${en2}" placeholder="Add notes…"></div>
+    <div class="row-actions">
+      <a href="https://instagram.com/${eu}" target="_blank" rel="noopener" class="btn btn-secondary btn-xs">DM →</a>
+      <button class="btn btn-ghost btn-xs ai-dm-btn" data-id="${lead.id}" title="Generate AI DM">✨</button>
+      <button class="btn btn-ghost btn-xs del-lead-btn" data-id="${lead.id}" title="Delete">🗑</button>
+    </div>
+  </div>`;
+}
+
+function mobileCard(lead) {
+  const eu=esc(lead.username), en=esc(lead.full_name||lead.username), en2=esc(lead.notes||'');
+  return `<div class="lead-card" data-id="${lead.id}">
+    <div class="lc-top">
+      <div class="lc-info">
+        <div class="lc-name">${en}</div>
+        <div class="lc-uname">@${eu}</div>
+        <div class="lc-meta">
+          <span class="badge ${SOURCE_BADGE[lead.source]||'badge-gray'}" style="font-size:10px;">${SOURCE_LABELS[lead.source]||lead.source}</span>
+          ${clientBadge(lead.clientId)}
+        </div>
+      </div>
+      <div class="score-circle ${scoreClass(lead.score)}">${lead.score}</div>
+    </div>
+    <select class="status-sel ss-${lead.status}" data-id="${lead.id}" style="width:100%;">${statusOptions(lead.status)}</select>
+    <input type="text" class="notes-inp" data-id="${lead.id}" value="${en2}" placeholder="Add notes…" style="margin-top:8px;">
+    <div class="lc-bottom">
+      <a href="https://instagram.com/${eu}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">DM →</a>
+      <button class="btn btn-ghost btn-sm ai-dm-btn" data-id="${lead.id}">✨ AI DM</button>
+      <button class="btn btn-ghost btn-sm del-lead-btn" data-id="${lead.id}">🗑 Delete</button>
+    </div>
+  </div>`;
+}
+
+function attachLeadHandlers(container) {
+  container.querySelectorAll('.status-sel').forEach(sel=>{
+    sel.addEventListener('change', e=>{
+      const lead=findLead(e.target.dataset.id);
+      if (!lead) return;
+      lead.status=e.target.value; LS.set('jbj-leads',leads);
+      renderLeads();
+    });
+  });
+  container.querySelectorAll('.notes-inp').forEach(inp=>{
+    inp.addEventListener('change', e=>{
+      const lead=findLead(e.target.dataset.id);
+      if (lead) { lead.notes=e.target.value; LS.set('jbj-leads',leads); }
+    });
+  });
+  container.querySelectorAll('.del-lead-btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const id=parseFloat(e.target.closest('[data-id]').dataset.id);
+      leads=leads.filter(l=>l.id!==id);
+      LS.set('jbj-leads',leads); renderAll();
+    });
+  });
+  container.querySelectorAll('.ai-dm-btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const lead=findLead(e.target.closest('[data-id]').dataset.id);
+      if (lead) openDMModal(lead);
+    });
+  });
+}
+
+// ── CLIENT FILTER STRIP ──
+function renderClientFilterStrip() {
+  const strip=q('client-filter-strip');
+  if (!clients.length) { strip.style.display='none'; return; }
+  strip.style.display='flex';
+  strip.innerHTML=[
+    `<button class="filter-btn${currentClientFilter==='all'?' active':''}" data-cf="all">All Clients</button>`,
+    `<button class="filter-btn${currentClientFilter==='__personal__'?' active':''}" data-cf="__personal__">Personal</button>`,
+    ...clients.map(c=>`<button class="filter-btn${currentClientFilter===c.id?' active':''}" data-cf="${c.id}">${esc(c.name)}</button>`)
+  ].join('');
+  strip.querySelectorAll('[data-cf]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      currentClientFilter=btn.dataset.cf;
+      strip.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.cf===currentClientFilter));
+      renderLeads();
+    });
+  });
+}
+
+// ── CLIENTS ──
+function renderClients() {
+  const el=q('clients-list');
+  if (!clients.length) {
+    el.innerHTML=`<div class="empty-state"><div class="es-icon">👥</div><div class="es-title">No clients yet</div><div class="es-sub">Add your first client to tag and track their leads.</div></div>`;
+    return;
+  }
+  el.innerHTML=clients.map(c=>{
+    const cl=leads.filter(l=>l.clientId===c.id);
+    const contacted=cl.filter(l=>l.status!=='not-contacted').length;
+    const replied=cl.filter(l=>l.status==='replied').length;
+    const converted=cl.filter(l=>l.status==='converted').length;
+    return `<div class="client-card">
+      <div class="cc-header">
+        <div>
+          <div class="cc-name">${esc(c.name)}</div>
+          ${c.targetAudience?`<div class="cc-audience">${esc(c.targetAudience)}</div>`:''}
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button class="btn btn-secondary btn-xs export-cl-btn" data-id="${c.id}">Export CSV</button>
+          <button class="btn btn-ghost btn-xs del-cl-btn" data-id="${c.id}">🗑</button>
+        </div>
+      </div>
+      <div class="cc-stats">
+        <div class="cc-stat"><b>${cl.length}</b>Leads</div>
+        <div class="cc-stat"><b>${contacted}</b>Contacted</div>
+        <div class="cc-stat"><b>${replied}</b>Replied</div>
+        <div class="cc-stat"><b>${converted}</b>Converted</div>
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.del-cl-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const c=clients.find(c=>c.id===btn.dataset.id);
+      if (!c||!confirm(`Delete client "${c.name}"? Leads won't be deleted.`)) return;
+      clients=clients.filter(c=>c.id!==btn.dataset.id);
+      LS.set('jbj-clients',clients);
+      populateScrapeClientDropdown(); renderClients(); renderClientFilterStrip();
+    });
+  });
+  el.querySelectorAll('.export-cl-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>exportClientCSV(btn.dataset.id));
+  });
+}
+
+function exportClientCSV(clientId) {
+  const c=clients.find(c=>c.id===clientId);
+  const cl=leads.filter(l=>l.clientId===clientId);
+  if (!cl.length) { toast('No leads for this client','error'); return; }
+  const cols=['username','full_name','score','source','status','notes','added_at'];
+  const rows=[cols.join(',')];
+  cl.forEach(l=>rows.push([
+    l.username,l.full_name||'',l.score,l.source,l.status,
+    `"${(l.notes||'').replace(/"/g,'""')}"`,l.added_at
+  ].join(',')));
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=Object.assign(document.createElement('a'),
+    {href:url, download:`${(c?.name||'client').replace(/\s+/g,'-')}-leads-${stamp()}.csv`});
+  a.click(); URL.revokeObjectURL(url);
+  toast(`Exported ${cl.length} leads for ${c?.name}`,'success');
+}
+
+function populateScrapeClientDropdown() {
+  q('scrape-client-tag').innerHTML='<option value="">Personal</option>'+
+    clients.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+}
+
+// ── SCRAPE HISTORY RENDER ──
+function renderScrapeHistory() {
+  const el=q('scrape-history-list');
+  if (!scrapeHistory.length) {
+    el.innerHTML=`<div class="empty-state" style="padding:32px 0;"><div class="es-icon">📋</div><div class="es-title">No scrapes yet</div><div class="es-sub">Start a scrape above to see history here.</div></div>`;
+    return;
+  }
+  el.innerHTML=scrapeHistory.slice(0,25).map(s=>{
+    const dotCls=s.status==='done'?'dot-ok':s.status==='running'?'dot-run':'dot-err';
+    const cn=s.clientId?(clients.find(c=>c.id===s.clientId)?.name||'?'):'Personal';
+    const short=s.target.length>42?s.target.slice(0,42)+'…':s.target;
+    const date=new Date(s.startedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    return `<div class="sh-item">
+      <div class="sh-info">
+        <div class="sh-title">
+          <span class="dot ${dotCls}"></span>
+          ${esc(SCRAPE_TYPE_LABELS[s.type]||s.type)} — <span style="color:var(--text-3);font-weight:400;">${esc(short)}</span>
+        </div>
+        <div class="sh-meta">${date} · ${SOURCE_LABELS[s.source]||s.source} · ${esc(cn)}${s.resultsCount?` · +${s.resultsCount} leads`:''}</div>
+      </div>
+      <button class="btn btn-secondary btn-xs rerun-btn" data-id="${s.id}" style="flex-shrink:0;">Re-run</button>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.rerun-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const s=scrapeHistory.find(h=>h.id===btn.dataset.id);
+      if (!s) return;
+      q('scrape-type').value=s.type; q('scrape-source').value=s.source;
+      q('scrape-target').value=s.target; q('scrape-max').value=s.maxResults;
+      if (s.clientId) q('scrape-client-tag').value=s.clientId;
+      updateScrapeHint();
+      toast('Form pre-filled — press Start Scrape to run again');
+    });
+  });
+}
+
+// ── APIFY SCRAPING ──
+const ACTOR_KEY = {
+  'post-likes':'likes','post-comments':'comments',
+  'profile-followers':'followers','profile-following':'following','hashtag':'hashtag'
+};
+
+function getActorId(type) {
+  const key=ACTOR_KEY[type];
+  return key?(settings.actors[key]||DEFAULT_ACTORS[key]):'';
+}
+
+function buildInput(type, target, maxR) {
+  const max=parseInt(maxR)||1000;
+  const clean=target.trim().replace(/^@/,'');
+  switch(type) {
+    case 'post-likes':        return {urls:[target], maxResults:max};
+    case 'post-comments':     return {directUrls:[target], maxCommentsPerPost:max};
+    case 'profile-followers': return {usernames:[clean], resultsType:'followers', resultsLimit:max};
+    case 'profile-following': return {usernames:[clean], resultsType:'following', resultsLimit:max};
+    case 'hashtag':           return {hashtags:[clean.replace(/^#/,'')], resultsLimit:max};
+    default:                  return {urls:[target]};
+  }
+}
+
+function updateScrapeHint() {
+  const type=q('scrape-type').value;
+  const [lbl,ph]=SCRAPE_HINTS[type]||['Target',''];
+  q('target-lbl').textContent=lbl;
+  q('scrape-target').placeholder=ph;
+  q('target-hint').textContent='';
+}
+
+async function startScrape() {
+  if (!settings.apifyToken) { toast('Add your Apify token in Settings first','error'); switchTab('settings'); return; }
+  const type=q('scrape-type').value, source=q('scrape-source').value;
+  const target=q('scrape-target').value.trim(), maxR=q('scrape-max').value;
+  const clientId=q('scrape-client-tag').value;
+  if (!target) { toast('Enter a target URL or username','error'); return; }
+  const actorId=getActorId(type);
+  if (!actorId) { toast('Actor ID not configured','error'); return; }
+
+  const prog=q('scrape-progress'), spTxt=q('sp-text'), btn=q('btn-start-scrape');
+  prog.style.display='block'; spTxt.textContent='Starting on Apify…'; btn.disabled=true;
+
+  const rec={
+    id:`scrape_${Date.now()}`, type, source, target,
+    maxResults:parseInt(maxR)||1000, clientId, actorId,
+    status:'running', startedAt:new Date().toISOString(),
+    finishedAt:'', resultsCount:0, runId:'', datasetId:''
+  };
+  scrapeHistory.unshift(rec); LS.set('jbj-scrapes',scrapeHistory);
+
+  try {
+    const res=await fetch(
+      `https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs?token=${settings.apifyToken}`,
+      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildInput(type,target,maxR))}
+    );
+    if (!res.ok) throw new Error(`Apify ${res.status}: ${await res.text()}`);
+    const data=await res.json();
+    rec.runId=data.data.id; rec.datasetId=data.data.defaultDatasetId;
+    LS.set('jbj-scrapes',scrapeHistory);
+    spTxt.textContent=`Running… polling every 10 s`;
+
+    const interval=setInterval(async()=>{
+      try {
+        const sr=await fetch(`https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs/${rec.runId}?token=${settings.apifyToken}`);
+        const sd=await sr.json();
+        const status=sd.data?.status;
+        spTxt.textContent=`Status: ${status||'checking…'}`;
+        if (!['SUCCEEDED','FAILED','ABORTED','TIMED-OUT'].includes(status)) return;
+        clearInterval(interval); delete activePolls[rec.id];
+        if (status!=='SUCCEEDED') {
+          rec.status='failed'; LS.set('jbj-scrapes',scrapeHistory);
+          finishScrapeUI(false,`Scrape ${status.toLowerCase()}`); return;
+        }
+        spTxt.textContent='Fetching results…';
+        const dr=await fetch(`https://api.apify.com/v2/datasets/${rec.datasetId}/items?token=${settings.apifyToken}&format=json&limit=10000`);
+        const items=await dr.json();
+        const {added,dupes}=ingestLeads(items,source,clientId);
+        rec.status='done'; rec.resultsCount=added; rec.finishedAt=new Date().toISOString();
+        LS.set('jbj-scrapes',scrapeHistory);
+        renderAll();
+        finishScrapeUI(true,`Done — +${added} leads added${dupes?`, ${dupes} dupes`:''}`);
+      } catch(e){ console.warn('Poll error:',e); }
+    },10000);
+    activePolls[rec.id]=interval;
+
+  } catch(err) {
+    rec.status='failed'; LS.set('jbj-scrapes',scrapeHistory);
+    finishScrapeUI(false,err.message);
+  }
+}
+
+function finishScrapeUI(ok,msg) {
+  q('scrape-progress').style.display='none';
+  q('btn-start-scrape').disabled=false;
+  toast(msg, ok?'success':'error');
+  renderScrapeHistory();
+}
+
+// ── AI DM GENERATOR ──
+function openDMModal(lead) {
+  currentDMLead=lead;
+  q('dm-lead-info').innerHTML=`<strong>${esc(lead.full_name||lead.username)}</strong> (@${esc(lead.username)}) &middot; ${SOURCE_LABELS[lead.source]||lead.source}`;
+  q('dm-box').textContent=lead.dm||'Click Generate to create a personalised opening message.';
+  q('dm-status').textContent=lead.dm?'Previously generated — click ↻ to regenerate.':'';
+  q('dm-modal').style.display='flex';
+}
+
+async function generateDM(force) {
+  const lead=currentDMLead;
+  if (!lead) return;
+  if (!force&&lead.dm) { q('dm-box').textContent=lead.dm; return; }
+  if (!settings.claudeApiKey) {
+    toast('Add your Claude API key in Settings first','error');
+    q('dm-modal').style.display='none'; switchTab('settings'); return;
+  }
+  const btnGen=q('btn-gen-dm'), statusEl=q('dm-status'), boxEl=q('dm-box');
+  btnGen.disabled=true; statusEl.textContent='Generating…'; boxEl.textContent='…';
+
+  const firstName=(lead.full_name||lead.username).split(' ')[0];
+  const sourceCtx={
+    'my-likes':'liked one of my Instagram posts',
+    'my-comments':'commented on one of my Instagram posts',
+    'my-followers':'followed me on Instagram',
+    'my-following':'is someone I follow on Instagram',
+    'competitor-likes':"liked a post from a fitness account I follow",
+    'competitor-comments':"commented on a competitor's post",
+    'competitor-followers':'follows a fitness competitor',
+    'competitor-following':'follows fitness-related accounts'
+  };
+  const ctx=sourceCtx[lead.source]||'is active in the fitness space';
+  const prompt=`Write a short, genuine Instagram DM opener to ${firstName} (@${lead.username}), who ${ctx}.
+
+Rules:
+- 2–3 sentences only
+- Warm and natural, like texting a new acquaintance
+- Reference something fitness-related but keep it conversational
+- End with a soft open-ended question to invite a reply
+- Absolutely NO pitch, NO coaching mention, NO links, NO hashtags
+- First person as Jack, a fitness coach who is genuinely curious
+
+Output only the DM text — no quotes, no labels, nothing else.`;
+
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'x-api-key':settings.claudeApiKey,
+        'anthropic-version':'2023-06-01',
+        'content-type':'application/json',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:200,messages:[{role:'user',content:prompt}]})
+    });
+    if (!res.ok) { const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||`API error ${res.status}`); }
+    const data=await res.json();
+    const dm=data.content?.[0]?.text?.trim()||'';
+    boxEl.textContent=dm; lead.dm=dm; LS.set('jbj-leads',leads);
+    statusEl.textContent='Generated ✓ — click Copy to use';
+  } catch(err) {
+    if (err.message.toLowerCase().includes('cors')||err.message.toLowerCase().includes('failed to fetch')) {
+      const fb=fallbackDM(lead); boxEl.textContent=fb; lead.dm=fb; LS.set('jbj-leads',leads);
+      statusEl.textContent='Template used (Claude API CORS blocked — consider a proxy for live use)';
+    } else {
+      boxEl.textContent='Error generating DM.'; statusEl.textContent=`Error: ${err.message}`;
+    }
+  } finally { btnGen.disabled=false; }
+}
+
+function fallbackDM(lead) {
+  const fn=(lead.full_name||lead.username).split(' ')[0];
+  const t=[
+    `Hey ${fn}! Noticed you're into fitness — how long have you been on the journey? Always great to connect with people taking their health seriously 💪`,
+    `What's up ${fn}! Your profile caught my eye. What does your training look like right now — gym, home, or outdoor?`,
+    `Hey ${fn}! Fellow fitness person here. Been keeping consistent lately? I'm always curious what other people's routines look like.`
+  ];
+  return t[Math.floor(Math.random()*t.length)];
+}
+
+// ── SETTINGS UI ──
+function loadSettingsUI() {
+  const ha=!!settings.apifyToken, hc=!!settings.claudeApiKey;
+  q('apify-dot').classList.toggle('set',ha);
+  q('apify-status-txt').textContent=ha?'Token saved (masked)':'Not set';
+  if (ha) q('apify-token-inp').value='••••••••••••••••';
+  q('claude-dot').classList.toggle('set',hc);
+  q('claude-status-txt').textContent=hc?'Key saved (masked)':'Not set';
+  if (hc) q('claude-key-inp').value='••••••••••••••••';
+  document.querySelectorAll('.actor-inp').forEach(inp=>{
+    inp.value=settings.actors[inp.dataset.key]||inp.placeholder;
+  });
+}
+
+// ── TAB SWITCHING ──
+function switchTab(name) {
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id===`tab-${name}`));
+  if (name==='leads')   renderLeads();
+  if (name==='scrape')  renderScrapeHistory();
+  if (name==='clients') renderClients();
+}
+
+// ── BIND EVENTS ──
+function bindEvents() {
+  // Nav
+  document.querySelectorAll('.nav-tab').forEach(t=>t.addEventListener('click',()=>switchTab(t.dataset.tab)));
+  q('hdr-new-scrape').addEventListener('click',()=>switchTab('scrape'));
+  q('go-settings-link').addEventListener('click',e=>{e.preventDefault();switchTab('settings');});
+
+  // CSV upload
+  q('csv-input').addEventListener('change',async e=>{
+    const files=Array.from(e.target.files), source=q('csv-source-sel').value;
+    let added=0,dupes=0;
+    for (const f of files) { const r=ingestLeads(parseCSV(await f.text()),source); added+=r.added; dupes+=r.dupes; }
+    e.target.value=''; renderAll();
+    toast(`+${added} added${dupes?`, ${dupes} dupes`:''}`, 'success');
+  });
+
+  // Status filters
+  q('status-filters').addEventListener('click',e=>{
+    const btn=e.target.closest('.filter-btn'); if (!btn) return;
+    currentStatusFilter=btn.dataset.filter;
+    q('status-filters').querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===currentStatusFilter));
+    renderLeads();
+  });
+
+  // Source filters
+  q('source-filters').addEventListener('click',e=>{
+    const btn=e.target.closest('.filter-btn'); if (!btn) return;
+    currentSourceFilter=btn.dataset.source;
+    q('source-filters').querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.source===currentSourceFilter));
+    renderLeads();
+  });
+
+  // Search
+  q('search').addEventListener('input',e=>{currentSearch=e.target.value.toLowerCase();renderLeads();});
+
+  // Clear leads
+  q('btn-clear-leads').addEventListener('click',()=>{
+    if (!confirm('Delete all leads? Cannot be undone.')) return;
+    leads=[]; LS.set('jbj-leads',leads); renderAll(); toast('All leads deleted');
+  });
+
+  // Scrape
+  q('scrape-type').addEventListener('change',updateScrapeHint);
+  q('btn-start-scrape').addEventListener('click',startScrape);
+  q('btn-clear-history').addEventListener('click',()=>{
+    if (!confirm('Clear scrape history?')) return;
+    scrapeHistory=[]; LS.set('jbj-scrapes',scrapeHistory); renderScrapeHistory();
+  });
+
+  // Add client
+  q('btn-add-client').addEventListener('click',()=>{
+    const name=q('cl-name').value.trim();
+    if (!name) { toast('Enter a client name','error'); return; }
+    clients.push({id:`client_${Date.now()}`,name,targetAudience:q('cl-audience').value.trim(),notes:q('cl-notes').value.trim(),createdAt:new Date().toISOString()});
+    LS.set('jbj-clients',clients);
+    q('cl-name').value=q('cl-audience').value=q('cl-notes').value='';
+    populateScrapeClientDropdown(); renderClients(); renderClientFilterStrip();
+    toast(`Client "${name}" added`,'success');
+  });
+
+  // Settings — Apify token
+  q('btn-save-apify').addEventListener('click',()=>{
+    const v=q('apify-token-inp').value.trim();
+    if (!v||v==='••••••••••••••••') { toast('Enter your Apify token','error'); return; }
+    settings.apifyToken=v; LS.set('jbj-settings',settings);
+    q('apify-token-inp').value='••••••••••••••••';
+    q('apify-dot').classList.add('set'); q('apify-status-txt').textContent='Token saved (masked)';
+    toast('Apify token saved','success');
+  });
+
+  // Settings — Claude key
+  q('btn-save-claude').addEventListener('click',()=>{
+    const v=q('claude-key-inp').value.trim();
+    if (!v||v==='••••••••••••••••') { toast('Enter your Claude API key','error'); return; }
+    settings.claudeApiKey=v; LS.set('jbj-settings',settings);
+    q('claude-key-inp').value='••••••••••••••••';
+    q('claude-dot').classList.add('set'); q('claude-status-txt').textContent='Key saved (masked)';
+    toast('Claude API key saved','success');
+  });
+
+  // Settings — Actor IDs
+  q('btn-save-actors').addEventListener('click',()=>{
+    document.querySelectorAll('.actor-inp').forEach(inp=>{
+      const v=inp.value.trim(); if (v) settings.actors[inp.dataset.key]=v;
+    });
+    LS.set('jbj-settings',settings); toast('Actor IDs saved','success');
+  });
+
+  // Danger zone
+  q('btn-wipe-leads').addEventListener('click',()=>{
+    if (!confirm('Delete ALL leads? Cannot be undone.')) return;
+    leads=[]; LS.set('jbj-leads',leads); renderAll(); toast('All leads deleted');
+  });
+  q('btn-wipe-settings').addEventListener('click',()=>{
+    if (!confirm('Clear all settings including API keys?')) return;
+    settings={apifyToken:'',claudeApiKey:'',actors:{...DEFAULT_ACTORS}};
+    LS.set('jbj-settings',settings); loadSettingsUI(); toast('Settings cleared');
+  });
+
+  // DM modal
+  q('btn-close-modal').addEventListener('click',()=>{ q('dm-modal').style.display='none'; });
+  q('dm-modal').addEventListener('click',e=>{ if (e.target===q('dm-modal')) q('dm-modal').style.display='none'; });
+  q('btn-gen-dm').addEventListener('click',()=>generateDM(false));
+  q('btn-regen-dm').addEventListener('click',()=>generateDM(true));
+  q('btn-copy-dm').addEventListener('click',()=>{
+    const txt=q('dm-box').textContent;
+    if (!txt||txt.startsWith('Click')) return;
+    navigator.clipboard.writeText(txt).then(()=>toast('DM copied!','success'));
+  });
+}
+
+// ── INIT ──
+function init() {
+  leads         = LS.get('jbj-leads',[]);
+  clients       = LS.get('jbj-clients',[]);
+  scrapeHistory = LS.get('jbj-scrapes',[]);
+  const saved   = LS.get('jbj-settings',{});
+  settings = {...settings,...saved, actors:{...DEFAULT_ACTORS,...(saved.actors||{})}};
+  loadSettingsUI();
+  populateScrapeClientDropdown();
+  bindEvents();
+  renderAll();
+}
+
+init();
+</script>
 </body>
 </html>
