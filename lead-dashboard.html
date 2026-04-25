@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JackedByJack — Lead Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0a0a;
+  --bg-2: #111;
+  --bg-3: #1a1a1a;
+  --line: #222;
+  --line-bright: #333;
+  --text: #f5f5f5;
+  --text-dim: #888;
+  --text-very-dim: #555;
+  --accent: #d4ff00;
+  --accent-dim: #9aba00;
+  --hot: #ff3366;
+  --warm: #ff8800;
+  --cool: #00aaff;
+  --converted: #00ff88;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-feature-settings: 'ss01', 'ss02';
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(212, 255, 0, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 100%, rgba(255, 51, 102, 0.05), transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+/* HEADER */
+header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.brand h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 56px;
+  letter-spacing: 2px;
+  line-height: 0.9;
+  color: var(--text);
+}
+
+.brand h1 span {
+  color: var(--accent);
+}
+
+.brand p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.header-stats {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.stat-pill {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  padding: 12px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-pill .num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 1px;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.stat-pill .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+}
+
+/* CONTROL BAR */
+.control-bar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.upload-zone {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--bg-2);
+  border: 1px dashed var(--line-bright);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.upload-zone:hover {
+  border-color: var(--accent);
+  background: var(--bg-3);
+}
+
+.upload-zone .icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 900;
+  font-size: 20px;
+}
+
+.upload-zone .text {
+  flex: 1;
+}
+
+.upload-zone .text-main {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.upload-zone .text-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.source-select {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 16px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  outline: none;
+}
+
+.source-select:focus {
+  border-color: var(--accent);
+}
+
+.btn {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  padding: 16px 28px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--text);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line-bright);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-3);
+  border-color: var(--accent);
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--hot);
+  border: 1px solid var(--hot);
+}
+
+.btn-danger:hover {
+  background: var(--hot);
+  color: var(--bg);
+  box-shadow: none;
+  transform: none;
+}
+
+input[type="file"] { display: none; }
+
+/* FILTER ROW */
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+}
+
+.filter-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  padding: 10px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-right: 1px solid var(--line);
+  transition: all 0.1s;
+}
+
+.filter-btn:last-child { border-right: none; }
+
+.filter-btn:hover { color: var(--text); }
+
+.filter-btn.active {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.search {
+  flex: 1;
+  min-width: 200px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 10px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  outline: none;
+}
+
+.search:focus {
+  border-color: var(--accent);
+}
+
+.search::placeholder {
+  color: var(--text-very-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* TABLE */
+.table-wrap {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 60px 80px 2fr 1fr 1fr 100px 1fr 1fr;
+  padding: 14px 20px;
+  background: var(--bg-3);
+  border-bottom: 1px solid var(--line);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 60px 80px 2fr 1fr 1fr 100px 1fr 1fr;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line);
+  align-items: center;
+  transition: background 0.1s;
+  font-size: 13px;
+}
+
+.table-row:hover {
+  background: var(--bg-3);
+}
+
+.table-row:last-child { border-bottom: none; }
+
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 1px;
+  background: var(--bg);
+  color: var(--accent);
+  border: 1px solid var(--line-bright);
+}
+
+.score-badge.high {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+}
+
+.score-badge.mid {
+  color: var(--warm);
+  border-color: var(--warm);
+}
+
+.source-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid;
+}
+
+.source-likes { color: var(--hot); border-color: var(--hot); }
+.source-comments { color: var(--warm); border-color: var(--warm); }
+.source-followers { color: var(--accent); border-color: var(--accent); }
+.source-competitor-likes { color: var(--cool); border-color: var(--cool); }
+.source-competitor-followers { color: #aa66ff; border-color: #aa66ff; }
+.source-competitor-comments { color: #ff66cc; border-color: #ff66cc; }
+
+.lead-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lead-name .name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.lead-name .username {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.account-type {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+}
+
+.account-type.public { color: var(--converted); }
+.account-type.private { color: var(--text-very-dim); }
+
+.status-select {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--text);
+  padding: 6px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  width: 100%;
+  outline: none;
+}
+
+.status-select:focus { border-color: var(--accent); }
+
+.status-not-contacted { color: var(--text-dim); }
+.status-dmed { color: var(--cool); border-color: var(--cool); }
+.status-replied { color: var(--warm); border-color: var(--warm); }
+.status-converted { color: var(--converted); border-color: var(--converted); }
+.status-not-interested { color: var(--text-very-dim); }
+
+.notes-input {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  padding: 6px 8px;
+  width: 100%;
+  outline: none;
+}
+
+.notes-input:hover, .notes-input:focus {
+  border-color: var(--line-bright);
+  background: var(--bg);
+}
+
+.notes-input::placeholder {
+  color: var(--text-very-dim);
+  font-style: italic;
+}
+
+.action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 6px 12px;
+  border: 1px solid var(--accent);
+  transition: all 0.1s;
+}
+
+.action-link:hover {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* EMPTY STATE */
+.empty {
+  padding: 80px 40px;
+  text-align: center;
+  color: var(--text-dim);
+}
+
+.empty h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  letter-spacing: 2px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.empty p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: var(--accent);
+  color: var(--bg);
+  padding: 14px 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 2px solid var(--text);
+  z-index: 100;
+  animation: slideIn 0.2s;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* DELETE BUTTON */
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-very-dim);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  transition: color 0.1s;
+}
+
+.delete-btn:hover {
+  color: var(--hot);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  .table-header, .table-row {
+    grid-template-columns: 50px 70px 2fr 1fr 100px 1fr;
+  }
+  .col-account, .col-notes {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .app { padding: 16px; }
+  .brand h1 { font-size: 36px; }
+  .control-bar { grid-template-columns: 1fr; }
+  .table-header, .table-row {
+    grid-template-columns: 1fr 80px;
+    gap: 8px;
+  }
+  .col-score, .col-source, .col-account, .col-status-header { display: none; }
+}
+
+footer {
+  margin-top: 48px;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-very-dim);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+footer span { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="brand">
+      <h1>LEAD <span>PIPELINE</span></h1>
+      <p>// jackedbyjack outreach console</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-pill">
+        <div class="num" id="stat-total">0</div>
+        <div class="label">Total Leads</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num" id="stat-untouched">0</div>
+        <div class="label">To DM</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num" id="stat-replied">0</div>
+        <div class="label">Replied</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num" id="stat-converted">0</div>
+        <div class="label">Converted</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="control-bar">
+    <label class="upload-zone" for="csv-input">
+      <div class="icon">+</div>
+      <div class="text">
+        <div class="text-main">Upload Apify CSV</div>
+        <div class="text-sub">// drag your scraped lead file here or click to browse</div>
+      </div>
+      <input type="file" id="csv-input" accept=".csv" multiple>
+    </label>
+    <select class="source-select" id="source-select">
+      <option value="my-likes">My Post Likes</option>
+      <option value="my-comments">My Post Comments</option>
+      <option value="my-followers">My Followers</option>
+      <option value="competitor-likes">Competitor Likes</option>
+      <option value="competitor-comments">Competitor Comments</option>
+      <option value="competitor-followers">Competitor Followers</option>
+    </select>
+    <button class="btn btn-danger" id="clear-all">Wipe All</button>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group" id="status-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="not-contacted">Not Contacted</button>
+      <button class="filter-btn" data-filter="dmed">DMed</button>
+      <button class="filter-btn" data-filter="replied">Replied</button>
+      <button class="filter-btn" data-filter="converted">Converted</button>
+    </div>
+    <div class="filter-group" id="source-filters">
+      <button class="filter-btn active" data-source="all">All Sources</button>
+      <button class="filter-btn" data-source="my-likes">My Likes</button>
+      <button class="filter-btn" data-source="my-comments">My Comments</button>
+      <button class="filter-btn" data-source="my-followers">My Followers</button>
+      <button class="filter-btn" data-source="competitor-likes">Comp. Likes</button>
+      <button class="filter-btn" data-source="competitor-followers">Comp. Followers</button>
+    </div>
+    <input type="text" class="search" id="search" placeholder="Search name or username...">
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-header">
+      <div class="col-score">Score</div>
+      <div class="col-source">Source</div>
+      <div>Lead</div>
+      <div class="col-account">Account</div>
+      <div class="col-status-header">Status</div>
+      <div></div>
+      <div class="col-notes">Notes</div>
+      <div></div>
+    </div>
+    <div id="leads-list"></div>
+  </div>
+
+  <footer>
+    SYSTEM <span>ONLINE</span> // BUILT BY JACK FOR JACK
+  </footer>
+</div>
+
+<script>
+// ============= STATE =============
+let leads = [];
+let currentStatusFilter = 'all';
+let currentSourceFilter = 'all';
+let currentSearch = '';
+
+// ============= STORAGE =============
+// Use localStorage as primary (works in regular browsers and on Netlify)
+// Fall back to window.storage if available (Claude artifacts environment)
+
+async function saveLeads() {
+  const data = JSON.stringify(leads);
+  // Try localStorage first - most reliable in browsers
+  try {
+    localStorage.setItem('jbj-leads-data', data);
+    return;
+  } catch (e) {
+    console.log('localStorage unavailable, trying window.storage');
+  }
+  // Fall back to window.storage if it exists
+  if (typeof window.storage !== 'undefined') {
+    try {
+      await window.storage.set('jbj-leads-data', data);
+    } catch (e) {
+      console.error('Storage save failed:', e);
+    }
+  }
+}
+
+async function loadLeads() {
+  // Try localStorage first
+  try {
+    const data = localStorage.getItem('jbj-leads-data');
+    if (data) {
+      leads = JSON.parse(data);
+      render();
+      return;
+    }
+  } catch (e) {
+    console.log('localStorage read failed, trying window.storage');
+  }
+  // Fall back to window.storage
+  if (typeof window.storage !== 'undefined') {
+    try {
+      const result = await window.storage.get('jbj-leads-data');
+      if (result && result.value) {
+        leads = JSON.parse(result.value);
+      }
+    } catch (e) {
+      console.log('No saved leads yet');
+      leads = [];
+    }
+  }
+  render();
+}
+
+// ============= CSV PARSING =============
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) return [];
+
+  // Parse header
+  const headers = parseCSVLine(lines[0]).map(h => h.trim().replace(/^\uFEFF/, ''));
+
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const values = parseCSVLine(lines[i]);
+    if (values.length === 0) continue;
+    const row = {};
+    headers.forEach((h, idx) => {
+      row[h] = (values[idx] || '').trim();
+    });
+    rows.push(row);
+  }
+  return rows;
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') {
+      if (inQuotes && line[i+1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (c === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += c;
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+// ============= SCORING =============
+function scoreLead(lead) {
+  let score = 0;
+  const username = (lead.username || '').toLowerCase();
+  const fullName = (lead.full_name || '').trim();
+
+  // Source priority - your audience is warmer
+  const sourceScores = {
+    'my-followers': 5,
+    'my-comments': 4,
+    'my-likes': 3,
+    'competitor-comments': 3,
+    'competitor-followers': 2,
+    'competitor-likes': 1
+  };
+  score += sourceScores[lead.source] || 0;
+
+  // Public account (can see content, easier to personalise)
+  if (lead.is_private === 'false' || lead.is_private === false) score += 2;
+
+  // Has real name
+  if (fullName && fullName.toLowerCase() !== username && fullName.length > 1) score += 2;
+
+  // Username quality (less digits = more likely real person)
+  const digitCount = (username.match(/\d/g) || []).length;
+  if (digitCount === 0) score += 2;
+  else if (digitCount < 3) score += 1;
+
+  // Username structure looks human
+  const cleanUsername = username.replace(/[._]/g, '');
+  if (/^[a-z]+$/.test(cleanUsername)) score += 1;
+
+  return Math.min(score, 10);
+}
+
+// ============= UPLOAD =============
+document.getElementById('csv-input').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files);
+  const source = document.getElementById('source-select').value;
+
+  let totalAdded = 0;
+  let totalDuplicates = 0;
+
+  for (const file of files) {
+    const text = await file.text();
+    const rows = parseCSV(text);
+
+    for (const row of rows) {
+      const username = row.username || row.Username || '';
+      if (!username) continue;
+
+      // Check for duplicate
+      const existing = leads.find(l => l.username === username);
+      if (existing) {
+        totalDuplicates++;
+        // If new source is higher priority, update source
+        const sourceRank = {
+          'my-followers': 6, 'my-comments': 5, 'my-likes': 4,
+          'competitor-comments': 3, 'competitor-followers': 2, 'competitor-likes': 1
+        };
+        if ((sourceRank[source] || 0) > (sourceRank[existing.source] || 0)) {
+          existing.source = source;
+          existing.score = scoreLead(existing);
+        }
+        continue;
+      }
+
+      const lead = {
+        id: Date.now() + Math.random(),
+        username: username,
+        full_name: row.full_name || row['full_name'] || '',
+        is_private: row.is_private || 'false',
+        is_verified: row.is_verified || 'false',
+        source: source,
+        status: 'not-contacted',
+        notes: '',
+        added_at: new Date().toISOString()
+      };
+      lead.score = scoreLead(lead);
+      leads.push(lead);
+      totalAdded++;
+    }
+  }
+
+  // Sort by score descending
+  leads.sort((a, b) => b.score - a.score);
+
+  await saveLeads();
+  render();
+  e.target.value = '';
+
+  showToast(`+${totalAdded} added${totalDuplicates ? ` (${totalDuplicates} dupes)` : ''}`);
+});
+
+// ============= FILTERS =============
+document.getElementById('status-filters').addEventListener('click', (e) => {
+  if (!e.target.classList.contains('filter-btn')) return;
+  document.querySelectorAll('#status-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  currentStatusFilter = e.target.dataset.filter;
+  render();
+});
+
+document.getElementById('source-filters').addEventListener('click', (e) => {
+  if (!e.target.classList.contains('filter-btn')) return;
+  document.querySelectorAll('#source-filters .filter-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  currentSourceFilter = e.target.dataset.source;
+  render();
+});
+
+document.getElementById('search').addEventListener('input', (e) => {
+  currentSearch = e.target.value.toLowerCase();
+  render();
+});
+
+// ============= CLEAR ALL =============
+document.getElementById('clear-all').addEventListener('click', async () => {
+  if (!confirm('Wipe all leads? This cannot be undone.')) return;
+  leads = [];
+  await saveLeads();
+  render();
+  showToast('All leads wiped');
+});
+
+// ============= RENDER =============
+function render() {
+  // Stats
+  document.getElementById('stat-total').textContent = leads.length;
+  document.getElementById('stat-untouched').textContent = leads.filter(l => l.status === 'not-contacted').length;
+  document.getElementById('stat-replied').textContent = leads.filter(l => l.status === 'replied').length;
+  document.getElementById('stat-converted').textContent = leads.filter(l => l.status === 'converted').length;
+
+  // Filter
+  let filtered = leads;
+  if (currentStatusFilter !== 'all') {
+    filtered = filtered.filter(l => l.status === currentStatusFilter);
+  }
+  if (currentSourceFilter !== 'all') {
+    filtered = filtered.filter(l => l.source === currentSourceFilter);
+  }
+  if (currentSearch) {
+    filtered = filtered.filter(l =>
+      l.username.toLowerCase().includes(currentSearch) ||
+      l.full_name.toLowerCase().includes(currentSearch)
+    );
+  }
+
+  const list = document.getElementById('leads-list');
+
+  if (filtered.length === 0) {
+    list.innerHTML = `
+      <div class="empty">
+        <h3>${leads.length === 0 ? 'NO LEADS YET' : 'NO MATCHES'}</h3>
+        <p>${leads.length === 0 ? '// upload your first apify csv to get started' : '// try different filters'}</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = filtered.map(lead => renderRow(lead)).join('');
+
+  // Attach handlers
+  list.querySelectorAll('.status-select').forEach(sel => {
+    sel.addEventListener('change', async (e) => {
+      const id = parseFloat(e.target.dataset.id);
+      const lead = leads.find(l => l.id === id);
+      if (lead) {
+        lead.status = e.target.value;
+        await saveLeads();
+        render();
+      }
+    });
+  });
+
+  list.querySelectorAll('.notes-input').forEach(input => {
+    input.addEventListener('change', async (e) => {
+      const id = parseFloat(e.target.dataset.id);
+      const lead = leads.find(l => l.id === id);
+      if (lead) {
+        lead.notes = e.target.value;
+        await saveLeads();
+      }
+    });
+  });
+
+  list.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const id = parseFloat(e.target.dataset.id);
+      leads = leads.filter(l => l.id !== id);
+      await saveLeads();
+      render();
+    });
+  });
+}
+
+function renderRow(lead) {
+  const scoreClass = lead.score >= 8 ? 'high' : lead.score >= 5 ? 'mid' : '';
+  const sourceClass = `source-${lead.source}`;
+  const sourceLabel = {
+    'my-likes': 'My Likes',
+    'my-comments': 'My Comm.',
+    'my-followers': 'My Foll.',
+    'competitor-likes': 'Comp. Lk',
+    'competitor-comments': 'Comp. Cm',
+    'competitor-followers': 'Comp. Fl'
+  }[lead.source] || lead.source;
+
+  const isPrivate = lead.is_private === 'true' || lead.is_private === true;
+  const accountClass = isPrivate ? 'private' : 'public';
+  const accountLabel = isPrivate ? 'PRIVATE' : 'PUBLIC';
+
+  const profileUrl = `https://instagram.com/${lead.username}`;
+  const escName = (lead.full_name || lead.username).replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const escUsername = lead.username.replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const escNotes = (lead.notes || '').replace(/"/g, '&quot;');
+
+  return `
+    <div class="table-row" data-id="${lead.id}">
+      <div class="col-score"><div class="score-badge ${scoreClass}">${lead.score}</div></div>
+      <div class="col-source"><span class="source-tag ${sourceClass}">${sourceLabel}</span></div>
+      <div class="lead-name">
+        <div class="name">${escName || '—'}</div>
+        <div class="username">@${escUsername}</div>
+      </div>
+      <div class="col-account"><span class="account-type ${accountClass}">${accountLabel}</span></div>
+      <div class="col-status-header"></div>
+      <div>
+        <select class="status-select status-${lead.status}" data-id="${lead.id}">
+          <option value="not-contacted" ${lead.status==='not-contacted'?'selected':''}>Not Contacted</option>
+          <option value="dmed" ${lead.status==='dmed'?'selected':''}>DMed</option>
+          <option value="replied" ${lead.status==='replied'?'selected':''}>Replied</option>
+          <option value="converted" ${lead.status==='converted'?'selected':''}>Converted</option>
+          <option value="not-interested" ${lead.status==='not-interested'?'selected':''}>Not Interested</option>
+        </select>
+      </div>
+      <div class="col-notes">
+        <input type="text" class="notes-input" data-id="${lead.id}" value="${escNotes}" placeholder="add notes...">
+      </div>
+      <div style="display:flex; gap:8px; align-items:center; justify-content:flex-end;">
+        <a href="${profileUrl}" target="_blank" class="action-link">DM →</a>
+        <button class="delete-btn" data-id="${lead.id}" title="Delete">×</button>
+      </div>
+    </div>
+  `;
+}
+
+// ============= TOAST =============
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ============= INIT =============
+loadLeads();
+</script>
+
+</body>
+</html>
