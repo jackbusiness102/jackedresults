@@ -1032,7 +1032,7 @@ function buildInput(type, target, maxR) {
   const max=parseInt(maxR)||1000;
   const clean=target.trim().replace(/^@/,'');
   switch(type) {
-    case 'post-likes':        return {posts:[target], maxResults:max};
+    case 'post-likes':        return {posts:[target], max_count:max};
     case 'post-comments':     return {directUrls:[target], maxCommentsPerPost:max};
     case 'profile-followers': return {usernames:[clean], resultsType:'followers', resultsLimit:max};
     case 'profile-following': return {usernames:[clean], resultsType:'following', resultsLimit:max};
