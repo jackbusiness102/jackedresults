@@ -315,6 +315,26 @@ select.input { cursor: pointer; }
 @media (max-width: 500px) {
   .app-content { padding: 14px 12px 60px; }
 }
+
+/* ── Scrape Type Pills ── */
+.type-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.type-pill {
+  padding: 6px 13px; border-radius: 20px; font-size: 13px; font-weight: 500;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-2); cursor: pointer; transition: all .12s; font-family: inherit;
+}
+.type-pill:hover { border-color: var(--accent); color: var(--accent); }
+.type-pill.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+
+/* ── Balance Card ── */
+.bal-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.bal-cell {
+  text-align: center; padding: 12px 8px;
+  background: var(--surface-2); border-radius: var(--r-sm);
+}
+.bal-cell-num { font-size: 18px; font-weight: 700; line-height: 1.1; }
+.bal-cell-lbl { font-size: 10px; color: var(--text-3); font-weight: 600;
+  text-transform: uppercase; letter-spacing: .4px; margin-top: 3px; }
 </style>
 </head>
 <body>
@@ -411,37 +431,32 @@ select.input { cursor: pointer; }
         <div class="card-sub">Pull leads from Instagram via Apify — no manual CSV needed</div>
       </div>
 
-      <div class="form-row" style="grid-template-columns:1fr 1fr;">
-        <div class="form-group">
-          <label class="form-label">Scrape Type</label>
-          <select class="input" id="scrape-type">
-            <option value="post-likes">Post Likes</option>
-            <option value="post-comments">Post Commenters</option>
-            <option value="profile-followers">Profile Followers</option>
-            <option value="profile-following">Profile Following</option>
-            <option value="hashtag">Hashtag Engagers</option>
-            <option value="competitor-audience">Competitor Audience</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Source Category</label>
-          <select class="input" id="scrape-source">
-            <option value="my-likes">My Likes</option>
-            <option value="my-comments">My Comments</option>
-            <option value="my-followers">My Followers</option>
-            <option value="my-following">My Following</option>
-            <option value="competitor-likes">Comp. Likes</option>
-            <option value="competitor-comments">Comp. Comments</option>
-            <option value="competitor-followers">Comp. Followers</option>
-            <option value="competitor-following">Comp. Following</option>
-          </select>
+      <div class="form-group">
+        <label class="form-label">Scrape Types <span style="font-weight:400;color:var(--text-3);">— pick one or more</span></label>
+        <div class="type-pills" id="scrape-type-pills">
+          <button class="type-pill active" data-type="post-likes">Post Likes</button>
+          <button class="type-pill" data-type="post-comments">Post Comments</button>
+          <button class="type-pill" data-type="profile-followers">Profile Followers</button>
+          <button class="type-pill" data-type="profile-following">Profile Following</button>
+          <button class="type-pill" data-type="hashtag">Hashtag</button>
+          <button class="type-pill" data-type="competitor-audience">Competitor Audience</button>
         </div>
       </div>
 
+      <div id="scrape-targets-wrap"></div>
+
       <div class="form-group">
-        <label class="form-label" id="target-lbl">Post URL</label>
-        <input type="text" class="input" id="scrape-target" placeholder="https://www.instagram.com/p/…">
-        <div class="form-hint" id="target-hint"></div>
+        <label class="form-label">Source Category</label>
+        <select class="input" id="scrape-source">
+          <option value="my-likes">My Likes</option>
+          <option value="my-comments">My Comments</option>
+          <option value="my-followers">My Followers</option>
+          <option value="my-following">My Following</option>
+          <option value="competitor-likes">Comp. Likes</option>
+          <option value="competitor-comments">Comp. Comments</option>
+          <option value="competitor-followers">Comp. Followers</option>
+          <option value="competitor-following">Comp. Following</option>
+        </select>
       </div>
 
       <div class="form-row" style="grid-template-columns:1fr 1fr;">
@@ -529,6 +544,33 @@ select.input { cursor: pointer; }
       <div class="key-indicator">
         <span class="key-dot" id="apify-dot"></span>
         <span id="apify-status-txt">Not set</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px;">
+        <div>
+          <div class="card-title">Apify Credit Balance</div>
+          <div class="card-sub">Current usage and remaining budget</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="btn-fetch-balance">Check Balance</button>
+      </div>
+      <div id="balance-display" style="display:none;">
+        <div class="bal-grid" style="margin-bottom:10px;">
+          <div class="bal-cell">
+            <div class="bal-cell-num" id="bal-remaining">—</div>
+            <div class="bal-cell-lbl">Remaining</div>
+          </div>
+          <div class="bal-cell">
+            <div class="bal-cell-num" id="bal-used">—</div>
+            <div class="bal-cell-lbl">Used this month</div>
+          </div>
+          <div class="bal-cell">
+            <div class="bal-cell-num" id="bal-local-spent">—</div>
+            <div class="bal-cell-lbl">Tracked locally</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-3);" id="bal-plan-label"></div>
       </div>
     </div>
 
@@ -622,6 +664,7 @@ let currentStatusFilter = 'all', currentSourceFilter = 'all';
 let currentClientFilter = 'all', currentSearch = '';
 let currentDMLead = null;
 const activePolls = {};
+let selectedTypes = new Set(['post-likes']);
 
 // ── CONSTANTS ──
 const SOURCE_LABELS = {
@@ -991,18 +1034,24 @@ function renderScrapeHistory() {
     el.innerHTML=`<div class="empty-state" style="padding:32px 0;"><div class="es-icon">📋</div><div class="es-title">No scrapes yet</div><div class="es-sub">Start a scrape above to see history here.</div></div>`;
     return;
   }
-  el.innerHTML=scrapeHistory.slice(0,25).map(s=>{
+  const trackedRuns=scrapeHistory.filter(s=>s.costUsd!=null);
+  const totalTracked=trackedRuns.reduce((sum,s)=>sum+(s.costUsd||0),0);
+  const costSummary=trackedRuns.length
+    ?`<div style="font-size:12px;color:var(--text-3);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">Tracked spend: <strong style="color:var(--text);">$${totalTracked.toFixed(4)}</strong> across ${trackedRuns.length} run${trackedRuns.length!==1?'s':''}</div>`
+    :'';
+  el.innerHTML=costSummary+scrapeHistory.slice(0,25).map(s=>{
     const dotCls=s.status==='done'?'dot-ok':s.status==='running'?'dot-run':'dot-err';
     const cn=s.clientId?(clients.find(c=>c.id===s.clientId)?.name||'?'):'Personal';
     const short=s.target.length>42?s.target.slice(0,42)+'…':s.target;
     const date=new Date(s.startedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const cost=s.costUsd!=null?` · <span style="color:var(--green);font-weight:500;">$${s.costUsd.toFixed(4)}</span>`:'';
     return `<div class="sh-item">
       <div class="sh-info">
         <div class="sh-title">
           <span class="dot ${dotCls}"></span>
           ${esc(SCRAPE_TYPE_LABELS[s.type]||s.type)} — <span style="color:var(--text-3);font-weight:400;">${esc(short)}</span>
         </div>
-        <div class="sh-meta">${date} · ${SOURCE_LABELS[s.source]||s.source} · ${esc(cn)}${s.resultsCount?` · +${s.resultsCount} leads`:''}</div>
+        <div class="sh-meta">${date} · ${SOURCE_LABELS[s.source]||s.source} · ${esc(cn)}${s.resultsCount?` · +${s.resultsCount} leads`:''}${cost}</div>
       </div>
       <button class="btn btn-secondary btn-xs rerun-btn" data-id="${s.id}" style="flex-shrink:0;">Re-run</button>
     </div>`;
@@ -1011,10 +1060,17 @@ function renderScrapeHistory() {
     btn.addEventListener('click',()=>{
       const s=scrapeHistory.find(h=>h.id===btn.dataset.id);
       if (!s) return;
-      q('scrape-type').value=s.type; q('scrape-source').value=s.source;
-      q('scrape-target').value=s.target; q('scrape-max').value=s.maxResults;
+      selectedTypes=new Set([s.type]);
+      q('scrape-type-pills').querySelectorAll('.type-pill').forEach(p=>{
+        p.classList.toggle('active',p.dataset.type===s.type);
+      });
+      renderScrapeTargetInputs();
+      const inp=document.querySelector(`.scrape-target-inp[data-type="${s.type}"]`);
+      if (inp) inp.value=s.target;
+      q('scrape-source').value=s.source;
+      q('scrape-max').value=s.maxResults;
       if (s.clientId) q('scrape-client-tag').value=s.clientId;
-      updateScrapeHint();
+      switchTab('scrape');
       toast('Form pre-filled — press Start Scrape to run again');
     });
   });
@@ -1057,86 +1113,121 @@ function buildInput(type, target, maxR) {
   }
 }
 
-function updateScrapeHint() {
-  const type=q('scrape-type').value;
-  const [lbl,ph,hint]=SCRAPE_HINTS[type]||['Target','',''];
-  q('target-lbl').textContent=lbl;
-  q('scrape-target').placeholder=ph;
-  q('target-hint').textContent=hint||'';
-  const srcMap={
-    'post-likes':'my-likes','post-comments':'my-comments',
-    'profile-followers':'my-followers','profile-following':'my-following',
-    'competitor-audience':'competitor-followers'
-  };
-  if (srcMap[type]) q('scrape-source').value=srcMap[type];
+function renderScrapeTargetInputs() {
+  const wrap=q('scrape-targets-wrap');
+  if (!selectedTypes.size) { wrap.innerHTML=''; return; }
+  wrap.innerHTML=[...selectedTypes].map(type=>{
+    const [lbl,ph,hint]=SCRAPE_HINTS[type]||['Target','',''];
+    return `<div class="form-group">
+      <label class="form-label">${esc(SCRAPE_TYPE_LABELS[type]||type)} — ${esc(lbl)}</label>
+      <input type="text" class="input scrape-target-inp" data-type="${type}" placeholder="${esc(ph)}">
+      ${hint?`<div class="form-hint">${esc(hint)}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+async function fetchApifyBalance() {
+  if (!settings.apifyToken) return;
+  try {
+    const r=await fetch(`https://api.apify.com/v2/users/me?token=${settings.apifyToken}`);
+    if (!r.ok) return;
+    const d=await r.json();
+    const plan=d.data?.plan||{};
+    const usage=d.data?.monthlyUsage||{};
+    const limit=typeof plan.monthlyUsageCreditsUsd==='number'?plan.monthlyUsageCreditsUsd:null;
+    const used=typeof usage.totalUsd==='number'?usage.totalUsd:null;
+    const remaining=limit!==null&&used!==null?limit-used:null;
+    const fmt=v=>v!==null?`$${v.toFixed(2)}`:'—';
+    q('bal-remaining').textContent=fmt(remaining);
+    q('bal-used').textContent=fmt(used);
+    const localSpent=scrapeHistory.reduce((s,h)=>s+(h.costUsd||0),0);
+    q('bal-local-spent').textContent=localSpent>0?`$${localSpent.toFixed(4)}`:'$0.00';
+    if (plan.id) q('bal-plan-label').textContent=`Plan: ${plan.id}`;
+    q('balance-display').style.display='block';
+  } catch(e){ console.warn('Balance fetch failed:',e); }
 }
 
 async function startScrape() {
   if (!settings.apifyToken) { toast('Add your Apify token in Settings first','error'); switchTab('settings'); return; }
-  const type=q('scrape-type').value, source=q('scrape-source').value;
-  const target=q('scrape-target').value.trim(), maxR=q('scrape-max').value;
+  if (!selectedTypes.size) { toast('Select at least one scrape type','error'); return; }
+
+  const source=q('scrape-source').value;
+  const maxR=q('scrape-max').value;
   const clientId=q('scrape-client-tag').value;
-  if (!target) { toast('Enter a target URL or username','error'); return; }
-  const actorId=getActorId(type);
-  if (!actorId) { toast('Actor ID not configured','error'); return; }
+
+  const runs=[];
+  for (const type of selectedTypes) {
+    const inp=document.querySelector(`.scrape-target-inp[data-type="${type}"]`);
+    const target=inp?inp.value.trim():'';
+    if (!target) { toast(`Enter a target for ${SCRAPE_TYPE_LABELS[type]||type}`,'error'); return; }
+    const actorId=getActorId(type);
+    if (!actorId) { toast(`Actor not configured for ${SCRAPE_TYPE_LABELS[type]||type}`,'error'); return; }
+    runs.push({type,target,actorId});
+  }
 
   const prog=q('scrape-progress'), spTxt=q('sp-text'), btn=q('btn-start-scrape');
-  prog.style.display='block'; spTxt.textContent='Starting on Apify…'; btn.disabled=true;
+  prog.style.display='block'; btn.disabled=true;
 
-  const rec={
-    id:`scrape_${Date.now()}`, type, source, target,
-    maxResults:parseInt(maxR)||1000, clientId, actorId,
-    status:'running', startedAt:new Date().toISOString(),
-    finishedAt:'', resultsCount:0, runId:'', datasetId:''
-  };
-  scrapeHistory.unshift(rec); LS.set('jbj-scrapes',scrapeHistory);
+  for (let i=0;i<runs.length;i++) {
+    const {type,target,actorId}=runs[i];
+    const prefix=runs.length>1?`[${i+1}/${runs.length}] `:'';
+    spTxt.textContent=`${prefix}Starting ${SCRAPE_TYPE_LABELS[type]||type}…`;
 
-  try {
-    const res=await fetch(
-      `https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs?token=${settings.apifyToken}`,
-      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildInput(type,target,maxR))}
-    );
-    if (!res.ok) throw new Error(`Apify ${res.status}: ${await res.text()}`);
-    const data=await res.json();
-    rec.runId=data.data.id; rec.datasetId=data.data.defaultDatasetId;
-    LS.set('jbj-scrapes',scrapeHistory);
-    spTxt.textContent=`Running… polling every 10 s`;
+    const rec={
+      id:`scrape_${Date.now()}`, type, source, target,
+      maxResults:parseInt(maxR)||1000, clientId, actorId,
+      status:'running', startedAt:new Date().toISOString(),
+      finishedAt:'', resultsCount:0, runId:'', datasetId:'', costUsd:null
+    };
+    scrapeHistory.unshift(rec); LS.set('jbj-scrapes',scrapeHistory);
 
-    const interval=setInterval(async()=>{
-      try {
-        const sr=await fetch(`https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs/${rec.runId}?token=${settings.apifyToken}`);
-        const sd=await sr.json();
-        const status=sd.data?.status;
-        spTxt.textContent=`Status: ${status||'checking…'}`;
-        if (!['SUCCEEDED','FAILED','ABORTED','TIMED-OUT'].includes(status)) return;
-        clearInterval(interval); delete activePolls[rec.id];
-        if (status!=='SUCCEEDED') {
-          rec.status='failed'; LS.set('jbj-scrapes',scrapeHistory);
-          finishScrapeUI(false,`Scrape ${status.toLowerCase()}`); return;
-        }
-        spTxt.textContent='Fetching results…';
-        const dr=await fetch(`https://api.apify.com/v2/datasets/${rec.datasetId}/items?token=${settings.apifyToken}&format=json&limit=10000`);
-        const items=await dr.json();
-        const {added,dupes}=ingestLeads(items,source,clientId);
-        rec.status='done'; rec.resultsCount=added; rec.finishedAt=new Date().toISOString();
-        LS.set('jbj-scrapes',scrapeHistory);
-        renderAll();
-        finishScrapeUI(true,`Done — +${added} leads added${dupes?`, ${dupes} dupes`:''}`);
-      } catch(e){ console.warn('Poll error:',e); }
-    },10000);
-    activePolls[rec.id]=interval;
+    try {
+      const res=await fetch(
+        `https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs?token=${settings.apifyToken}`,
+        {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildInput(type,target,maxR))}
+      );
+      if (!res.ok) throw new Error(`Apify ${res.status}: ${await res.text()}`);
+      const data=await res.json();
+      rec.runId=data.data.id; rec.datasetId=data.data.defaultDatasetId;
+      LS.set('jbj-scrapes',scrapeHistory);
 
-  } catch(err) {
-    rec.status='failed'; LS.set('jbj-scrapes',scrapeHistory);
-    finishScrapeUI(false,err.message);
+      await new Promise(resolve=>{
+        const interval=setInterval(async()=>{
+          try {
+            const sr=await fetch(`https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs/${rec.runId}?token=${settings.apifyToken}`);
+            const sd=await sr.json();
+            const status=sd.data?.status;
+            spTxt.textContent=`${prefix}${SCRAPE_TYPE_LABELS[type]||type}: ${status||'checking…'}`;
+            if (!['SUCCEEDED','FAILED','ABORTED','TIMED-OUT'].includes(status)) return;
+            clearInterval(interval); delete activePolls[rec.id];
+            if (status!=='SUCCEEDED') {
+              rec.status='failed'; LS.set('jbj-scrapes',scrapeHistory);
+              toast(`${SCRAPE_TYPE_LABELS[type]||type} ${status.toLowerCase()}`,'error');
+              resolve(); return;
+            }
+            spTxt.textContent=`${prefix}Fetching ${SCRAPE_TYPE_LABELS[type]||type} results…`;
+            const dr=await fetch(`https://api.apify.com/v2/datasets/${rec.datasetId}/items?token=${settings.apifyToken}&format=json&limit=10000`);
+            const items=await dr.json();
+            const {added,dupes}=ingestLeads(items,source,clientId);
+            rec.costUsd=sd.data?.usageTotalUsd??null;
+            rec.status='done'; rec.resultsCount=added; rec.finishedAt=new Date().toISOString();
+            LS.set('jbj-scrapes',scrapeHistory);
+            renderAll();
+            toast(`${SCRAPE_TYPE_LABELS[type]||type}: +${added} leads${dupes?`, ${dupes} dupes`:''}`,'success');
+            resolve();
+          } catch(e){ console.warn('Poll error:',e); }
+        },10000);
+        activePolls[rec.id]=interval;
+      });
+    } catch(err) {
+      rec.status='failed'; LS.set('jbj-scrapes',scrapeHistory);
+      toast(`${SCRAPE_TYPE_LABELS[type]||type}: ${err.message}`,'error');
+    }
   }
-}
 
-function finishScrapeUI(ok,msg) {
-  q('scrape-progress').style.display='none';
-  q('btn-start-scrape').disabled=false;
-  toast(msg, ok?'success':'error');
+  prog.style.display='none'; btn.disabled=false;
   renderScrapeHistory();
+  fetchApifyBalance();
 }
 
 // ── AI DM GENERATOR ──
@@ -1283,8 +1374,30 @@ function bindEvents() {
     leads=[]; LS.set('jbj-leads',leads); renderAll(); toast('All leads deleted');
   });
 
-  // Scrape
-  q('scrape-type').addEventListener('change',updateScrapeHint);
+  // Scrape type pills
+  q('scrape-type-pills').addEventListener('click',e=>{
+    const pill=e.target.closest('.type-pill'); if (!pill) return;
+    const type=pill.dataset.type;
+    if (selectedTypes.has(type)) {
+      if (selectedTypes.size===1) return;
+      selectedTypes.delete(type); pill.classList.remove('active');
+    } else {
+      selectedTypes.add(type); pill.classList.add('active');
+    }
+    renderScrapeTargetInputs();
+    const srcMap={
+      'post-likes':'my-likes','post-comments':'my-comments',
+      'profile-followers':'my-followers','profile-following':'my-following',
+      'competitor-audience':'competitor-followers'
+    };
+    if (selectedTypes.size===1) {
+      const [t]=[...selectedTypes]; if (srcMap[t]) q('scrape-source').value=srcMap[t];
+    }
+  });
+
+  // Balance
+  q('btn-fetch-balance').addEventListener('click',fetchApifyBalance);
+
   q('btn-start-scrape').addEventListener('click',startScrape);
   q('btn-clear-history').addEventListener('click',()=>{
     if (!confirm('Clear scrape history?')) return;
@@ -1363,7 +1476,7 @@ function init() {
   loadSettingsUI();
   populateScrapeClientDropdown();
   bindEvents();
-  updateScrapeHint();
+  renderScrapeTargetInputs();
   renderAll();
 }
 
