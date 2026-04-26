@@ -420,6 +420,7 @@ select.input { cursor: pointer; }
             <option value="profile-followers">Profile Followers</option>
             <option value="profile-following">Profile Following</option>
             <option value="hashtag">Hashtag Engagers</option>
+            <option value="competitor-audience">Competitor Audience</option>
           </select>
         </div>
         <div class="form-group">
@@ -440,7 +441,7 @@ select.input { cursor: pointer; }
       <div class="form-group">
         <label class="form-label" id="target-lbl">Post URL</label>
         <input type="text" class="input" id="scrape-target" placeholder="https://www.instagram.com/p/…">
-        <div class="form-hint" id="target-hint">Paste the full Instagram post URL</div>
+        <div class="form-hint" id="target-hint"></div>
       </div>
 
       <div class="form-row" style="grid-template-columns:1fr 1fr;">
@@ -641,7 +642,8 @@ const STATUS_LABELS = {
 };
 const SCRAPE_TYPE_LABELS = {
   'post-likes':'Post Likes','post-comments':'Post Comments',
-  'profile-followers':'Followers','profile-following':'Following','hashtag':'Hashtag'
+  'profile-followers':'Followers','profile-following':'Following',
+  'hashtag':'Hashtag','competitor-audience':'Competitor Audience'
 };
 const DEFAULT_ACTORS = {
   likes:'datadoping/instagram-likes-scraper', comments:'apify/instagram-comment-scraper',
@@ -649,11 +651,12 @@ const DEFAULT_ACTORS = {
   hashtag:'apify/instagram-hashtag-scraper'
 };
 const SCRAPE_HINTS = {
-  'post-likes':        ['Post URL',  'https://www.instagram.com/p/Cxxxxxxx/'],
-  'post-comments':     ['Post URL',  'https://www.instagram.com/p/Cxxxxxxx/'],
-  'profile-followers': ['Username',  'jackedbyjack'],
-  'profile-following': ['Username',  'jackedbyjack'],
-  'hashtag':           ['Hashtag',   'fitness  (no # needed)']
+  'post-likes':          ['Post URL',            'https://www.instagram.com/p/Cxxxxxxx/',           'Paste the full Instagram post or reel URL'],
+  'post-comments':       ['Post URL',            'https://www.instagram.com/p/Cxxxxxxx/',           'Paste the full Instagram post or reel URL'],
+  'profile-followers':   ['Profile URL or @user','https://instagram.com/username or jackedbyjack',  'Followers of this profile — highest-priority leads'],
+  'profile-following':   ['Profile URL or @user','https://instagram.com/username or jackedbyjack',  ''],
+  'hashtag':             ['Hashtag(s)',           'fitness, onlinecoach, fitnesscoach',              'Comma-separate multiple hashtags for broader niche reach'],
+  'competitor-audience': ['Competitor Profiles',  'username1, username2 or paste full profile URLs', 'Scrapes followers from every listed account — great for niche discovery'],
 };
 
 // ── STORAGE ──
@@ -1020,7 +1023,8 @@ function renderScrapeHistory() {
 // ── APIFY SCRAPING ──
 const ACTOR_KEY = {
   'post-likes':'likes','post-comments':'comments',
-  'profile-followers':'followers','profile-following':'following','hashtag':'hashtag'
+  'profile-followers':'followers','profile-following':'following',
+  'hashtag':'hashtag','competitor-audience':'followers'
 };
 
 function getActorId(type) {
@@ -1028,25 +1032,43 @@ function getActorId(type) {
   return key?(settings.actors[key]||DEFAULT_ACTORS[key]):'';
 }
 
+function parseInstagramUsername(raw) {
+  const m = raw.trim().match(/instagram\.com\/([^/?#\s]+)/);
+  return m ? m[1].replace(/\/$/, '') : raw.trim().replace(/^@/, '');
+}
+
 function buildInput(type, target, maxR) {
   const max=parseInt(maxR)||1000;
-  const clean=target.trim().replace(/^@/,'');
   switch(type) {
-    case 'post-likes':        return {posts:[target], max_count:max};
-    case 'post-comments':     return {directUrls:[target], maxCommentsPerPost:max};
-    case 'profile-followers': return {usernames:[clean], resultsType:'followers', resultsLimit:max};
-    case 'profile-following': return {usernames:[clean], resultsType:'following', resultsLimit:max};
-    case 'hashtag':           return {hashtags:[clean.replace(/^#/,'')], resultsLimit:max};
-    default:                  return {urls:[target]};
+    case 'post-likes':
+      return {posts:[target.trim()], max_count:max};
+    case 'post-comments':
+      return {directUrls:[target.trim()], maxCommentsPerPost:max};
+    case 'profile-followers':
+      return {usernames:[parseInstagramUsername(target)], resultsType:'followers', resultsLimit:max};
+    case 'profile-following':
+      return {usernames:[parseInstagramUsername(target)], resultsType:'following', resultsLimit:max};
+    case 'hashtag':
+      return {hashtags:target.split(',').map(h=>h.trim().replace(/^#/,'')).filter(Boolean), resultsLimit:max};
+    case 'competitor-audience':
+      return {usernames:target.split(',').map(t=>parseInstagramUsername(t)).filter(Boolean), resultsType:'followers', resultsLimit:max};
+    default:
+      return {urls:[target.trim()]};
   }
 }
 
 function updateScrapeHint() {
   const type=q('scrape-type').value;
-  const [lbl,ph]=SCRAPE_HINTS[type]||['Target',''];
+  const [lbl,ph,hint]=SCRAPE_HINTS[type]||['Target','',''];
   q('target-lbl').textContent=lbl;
   q('scrape-target').placeholder=ph;
-  q('target-hint').textContent='';
+  q('target-hint').textContent=hint||'';
+  const srcMap={
+    'post-likes':'my-likes','post-comments':'my-comments',
+    'profile-followers':'my-followers','profile-following':'my-following',
+    'competitor-audience':'competitor-followers'
+  };
+  if (srcMap[type]) q('scrape-source').value=srcMap[type];
 }
 
 async function startScrape() {
@@ -1341,6 +1363,7 @@ function init() {
   loadSettingsUI();
   populateScrapeClientDropdown();
   bindEvents();
+  updateScrapeHint();
   renderAll();
 }
 
