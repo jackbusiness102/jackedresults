@@ -702,6 +702,18 @@ const SCRAPE_HINTS = {
   'competitor-audience': ['Competitor Profiles',  'username1, username2 or paste full profile URLs', 'Scrapes followers from every listed account — great for niche discovery'],
 };
 
+const TYPE_GROUP = {
+  'profile-followers':'profile', 'profile-following':'profile',
+  'post-likes':'post',           'post-comments':'post',
+  'hashtag':'hashtag',           'competitor-audience':'competitor'
+};
+const GROUP_META = {
+  profile:    {label:'Profile URL or @username', placeholder:'https://instagram.com/username  or  @jackedbyjack', hint:'Both Followers and Following will use this profile'},
+  post:       {label:'Post URL',                 placeholder:'https://www.instagram.com/p/Cxxxxxxx/',            hint:'Likes and Comments will both pull from this post'},
+  hashtag:    {label:'Hashtag(s)',               placeholder:'fitness, onlinecoach, fitnesscoach',               hint:'Comma-separate for broader reach'},
+  competitor: {label:'Competitor Profiles',      placeholder:'username1, username2  (or full profile URLs)',      hint:'Scrapes followers from every listed account'},
+};
+
 // ── STORAGE ──
 const LS = {
   set(k,v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(_){} },
@@ -1065,7 +1077,8 @@ function renderScrapeHistory() {
         p.classList.toggle('active',p.dataset.type===s.type);
       });
       renderScrapeTargetInputs();
-      const inp=document.querySelector(`.scrape-target-inp[data-type="${s.type}"]`);
+      const g=TYPE_GROUP[s.type]||s.type;
+      const inp=document.querySelector(`.scrape-group-inp[data-group="${g}"]`);
       if (inp) inp.value=s.target;
       q('scrape-source').value=s.source;
       q('scrape-max').value=s.maxResults;
@@ -1116,12 +1129,20 @@ function buildInput(type, target, maxR) {
 function renderScrapeTargetInputs() {
   const wrap=q('scrape-targets-wrap');
   if (!selectedTypes.size) { wrap.innerHTML=''; return; }
-  wrap.innerHTML=[...selectedTypes].map(type=>{
-    const [lbl,ph,hint]=SCRAPE_HINTS[type]||['Target','',''];
+  // Group selected types so identical-target types share one input
+  const groups=new Map();
+  for (const type of selectedTypes) {
+    const g=TYPE_GROUP[type]||type;
+    if (!groups.has(g)) groups.set(g,[]);
+    groups.get(g).push(type);
+  }
+  wrap.innerHTML=[...groups.entries()].map(([g,types])=>{
+    const m=GROUP_META[g]||{label:'Target',placeholder:'',hint:''};
+    const typeList=types.map(t=>SCRAPE_TYPE_LABELS[t]||t).join(' + ');
     return `<div class="form-group">
-      <label class="form-label">${esc(SCRAPE_TYPE_LABELS[type]||type)} — ${esc(lbl)}</label>
-      <input type="text" class="input scrape-target-inp" data-type="${type}" placeholder="${esc(ph)}">
-      ${hint?`<div class="form-hint">${esc(hint)}</div>`:''}
+      <label class="form-label">${esc(m.label)} <span style="color:var(--text-3);font-weight:400;">→ ${esc(typeList)}</span></label>
+      <input type="text" class="input scrape-group-inp" data-group="${g}" placeholder="${esc(m.placeholder)}">
+      ${m.hint?`<div class="form-hint">${esc(m.hint)}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -1155,11 +1176,17 @@ async function startScrape() {
   const maxR=q('scrape-max').value;
   const clientId=q('scrape-client-tag').value;
 
+  // Collect one target value per group
+  const groupTargets={};
+  document.querySelectorAll('.scrape-group-inp').forEach(inp=>{
+    groupTargets[inp.dataset.group]=inp.value.trim();
+  });
+
   const runs=[];
   for (const type of selectedTypes) {
-    const inp=document.querySelector(`.scrape-target-inp[data-type="${type}"]`);
-    const target=inp?inp.value.trim():'';
-    if (!target) { toast(`Enter a target for ${SCRAPE_TYPE_LABELS[type]||type}`,'error'); return; }
+    const g=TYPE_GROUP[type]||type;
+    const target=groupTargets[g]||'';
+    if (!target) { toast(`Enter a ${GROUP_META[g]?.label||'target'}`,'error'); return; }
     const actorId=getActorId(type);
     if (!actorId) { toast(`Actor not configured for ${SCRAPE_TYPE_LABELS[type]||type}`,'error'); return; }
     runs.push({type,target,actorId});
