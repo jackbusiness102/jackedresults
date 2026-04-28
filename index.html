@@ -438,6 +438,7 @@ select.input { cursor: pointer; }
           <button class="type-pill" data-type="post-comments">Post Comments</button>
           <button class="type-pill" data-type="profile-followers">Profile Followers</button>
           <button class="type-pill" data-type="profile-following">Profile Following</button>
+          <button class="type-pill" data-type="profile-post-likes">Profile Post Likers</button>
           <button class="type-pill" data-type="hashtag">Hashtag</button>
           <button class="type-pill" data-type="competitor-audience">Competitor Audience</button>
         </div>
@@ -686,6 +687,7 @@ const STATUS_LABELS = {
 const SCRAPE_TYPE_LABELS = {
   'post-likes':'Post Likes','post-comments':'Post Comments',
   'profile-followers':'Followers','profile-following':'Following',
+  'profile-post-likes':'Profile Post Likers',
   'hashtag':'Hashtag','competitor-audience':'Competitor Audience'
 };
 const DEFAULT_ACTORS = {
@@ -703,12 +705,12 @@ const SCRAPE_HINTS = {
 };
 
 const TYPE_GROUP = {
-  'profile-followers':'profile', 'profile-following':'profile',
+  'profile-followers':'profile', 'profile-following':'profile', 'profile-post-likes':'profile',
   'post-likes':'post',           'post-comments':'post',
   'hashtag':'hashtag',           'competitor-audience':'competitor'
 };
 const GROUP_META = {
-  profile:    {label:'Profile URL or @username', placeholder:'https://instagram.com/username  or  @jackedbyjack', hint:'Both Followers and Following will use this profile'},
+  profile:    {label:'Profile URL or @username', placeholder:'https://instagram.com/username  or  @jackedbyjack', hint:'Followers, Following, and Post Likers all read from this one profile'},
   post:       {label:'Post URL',                 placeholder:'https://www.instagram.com/p/Cxxxxxxx/',            hint:'Likes and Comments will both pull from this post'},
   hashtag:    {label:'Hashtag(s)',               placeholder:'fitness, onlinecoach, fitnesscoach',               hint:'Comma-separate for broader reach'},
   competitor: {label:'Competitor Profiles',      placeholder:'username1, username2  (or full profile URLs)',      hint:'Scrapes followers from every listed account'},
@@ -1168,6 +1170,37 @@ async function fetchApifyBalance() {
   } catch(e){ console.warn('Balance fetch failed:',e); }
 }
 
+// ── APIFY HELPERS ──
+async function apifyStartRun(actorId, input) {
+  const r=await fetch(
+    `https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs?token=${settings.apifyToken}`,
+    {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)}
+  );
+  if (!r.ok) throw new Error(`Apify ${r.status}: ${await r.text()}`);
+  return (await r.json()).data;
+}
+
+function apifyPollRun(actorId, runId, onStatus) {
+  return new Promise(resolve=>{
+    const iv=setInterval(async()=>{
+      try {
+        const r=await fetch(`https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs/${runId}?token=${settings.apifyToken}`);
+        const d=await r.json();
+        const status=d.data?.status;
+        if (onStatus) onStatus(status||'…');
+        if (!['SUCCEEDED','FAILED','ABORTED','TIMED-OUT'].includes(status)) return;
+        clearInterval(iv);
+        resolve({status, runData:d.data});
+      } catch(e){ console.warn('Poll error:',e); }
+    },10000);
+  });
+}
+
+async function apifyFetchItems(datasetId) {
+  const r=await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?token=${settings.apifyToken}&format=json&limit=10000`);
+  return r.json();
+}
+
 async function startScrape() {
   if (!settings.apifyToken) { toast('Add your Apify token in Settings first','error'); switchTab('settings'); return; }
   if (!selectedTypes.size) { toast('Select at least one scrape type','error'); return; }
@@ -1176,7 +1209,6 @@ async function startScrape() {
   const maxR=q('scrape-max').value;
   const clientId=q('scrape-client-tag').value;
 
-  // Collect one target value per group
   const groupTargets={};
   document.querySelectorAll('.scrape-group-inp').forEach(inp=>{
     groupTargets[inp.dataset.group]=inp.value.trim();
@@ -1187,68 +1219,92 @@ async function startScrape() {
     const g=TYPE_GROUP[type]||type;
     const target=groupTargets[g]||'';
     if (!target) { toast(`Enter a ${GROUP_META[g]?.label||'target'}`,'error'); return; }
-    const actorId=getActorId(type);
-    if (!actorId) { toast(`Actor not configured for ${SCRAPE_TYPE_LABELS[type]||type}`,'error'); return; }
-    runs.push({type,target,actorId});
+    if (type!=='profile-post-likes') {
+      const actorId=getActorId(type);
+      if (!actorId) { toast(`Actor not configured for ${SCRAPE_TYPE_LABELS[type]||type}`,'error'); return; }
+    }
+    runs.push({type,target});
   }
 
   const prog=q('scrape-progress'), spTxt=q('sp-text'), btn=q('btn-start-scrape');
   prog.style.display='block'; btn.disabled=true;
 
   for (let i=0;i<runs.length;i++) {
-    const {type,target,actorId}=runs[i];
+    const {type,target}=runs[i];
+    const label=SCRAPE_TYPE_LABELS[type]||type;
     const prefix=runs.length>1?`[${i+1}/${runs.length}] `:'';
-    spTxt.textContent=`${prefix}Starting ${SCRAPE_TYPE_LABELS[type]||type}…`;
 
     const rec={
       id:`scrape_${Date.now()}`, type, source, target,
-      maxResults:parseInt(maxR)||1000, clientId, actorId,
+      maxResults:parseInt(maxR)||1000, clientId, actorId:'',
       status:'running', startedAt:new Date().toISOString(),
       finishedAt:'', resultsCount:0, runId:'', datasetId:'', costUsd:null
     };
     scrapeHistory.unshift(rec); LS.set('jbj-scrapes',scrapeHistory);
 
     try {
-      const res=await fetch(
-        `https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs?token=${settings.apifyToken}`,
-        {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(buildInput(type,target,maxR))}
-      );
-      if (!res.ok) throw new Error(`Apify ${res.status}: ${await res.text()}`);
-      const data=await res.json();
-      rec.runId=data.data.id; rec.datasetId=data.data.defaultDatasetId;
-      LS.set('jbj-scrapes',scrapeHistory);
+      if (type==='profile-post-likes') {
+        // ── Two-step: fetch profile posts → scrape likes ──
+        const followersActor=settings.actors.followers||DEFAULT_ACTORS.followers;
+        const likesActor=settings.actors.likes||DEFAULT_ACTORS.likes;
+        const profileUrl=/instagram\.com/.test(target)?target:`https://www.instagram.com/${parseInstagramUsername(target)}/`;
 
-      await new Promise(resolve=>{
-        const interval=setInterval(async()=>{
-          try {
-            const sr=await fetch(`https://api.apify.com/v2/acts/${encodeURIComponent(actorId)}/runs/${rec.runId}?token=${settings.apifyToken}`);
-            const sd=await sr.json();
-            const status=sd.data?.status;
-            spTxt.textContent=`${prefix}${SCRAPE_TYPE_LABELS[type]||type}: ${status||'checking…'}`;
-            if (!['SUCCEEDED','FAILED','ABORTED','TIMED-OUT'].includes(status)) return;
-            clearInterval(interval); delete activePolls[rec.id];
-            if (status!=='SUCCEEDED') {
-              rec.status='failed'; LS.set('jbj-scrapes',scrapeHistory);
-              toast(`${SCRAPE_TYPE_LABELS[type]||type} ${status.toLowerCase()}`,'error');
-              resolve(); return;
-            }
-            spTxt.textContent=`${prefix}Fetching ${SCRAPE_TYPE_LABELS[type]||type} results…`;
-            const dr=await fetch(`https://api.apify.com/v2/datasets/${rec.datasetId}/items?token=${settings.apifyToken}&format=json&limit=10000`);
-            const items=await dr.json();
-            const {added,dupes}=ingestLeads(items,source,clientId);
-            rec.costUsd=sd.data?.usageTotalUsd??null;
-            rec.status='done'; rec.resultsCount=added; rec.finishedAt=new Date().toISOString();
-            LS.set('jbj-scrapes',scrapeHistory);
-            renderAll();
-            toast(`${SCRAPE_TYPE_LABELS[type]||type}: +${added} leads${dupes?`, ${dupes} dupes`:''}`,'success');
-            resolve();
-          } catch(e){ console.warn('Poll error:',e); }
-        },10000);
-        activePolls[rec.id]=interval;
-      });
+        // Step 1: get the profile's recent posts
+        spTxt.textContent=`${prefix}Fetching recent posts from profile…`;
+        const postsRun=await apifyStartRun(followersActor,{directUrls:[profileUrl],resultsType:'posts',resultsLimit:6});
+        const {status:s1,runData:postsData}=await apifyPollRun(followersActor,postsRun.id,
+          s=>spTxt.textContent=`${prefix}Fetching posts: ${s}`);
+        if (s1!=='SUCCEEDED') throw new Error('Failed to fetch profile posts');
+
+        const posts=await apifyFetchItems(postsRun.defaultDatasetId);
+        const postUrls=posts.map(p=>p.url||(p.shortCode?`https://www.instagram.com/p/${p.shortCode}/`:'')).filter(Boolean);
+        if (!postUrls.length) throw new Error('No posts found on this profile');
+
+        // Step 2: scrape likes from those post URLs
+        spTxt.textContent=`${prefix}Scraping likes from ${postUrls.length} posts…`;
+        const likesRun=await apifyStartRun(likesActor,{posts:postUrls,max_count:parseInt(maxR)||1000});
+        rec.runId=likesRun.id; rec.datasetId=likesRun.defaultDatasetId; rec.actorId=likesActor;
+        LS.set('jbj-scrapes',scrapeHistory);
+
+        const {status:s2,runData:likesData}=await apifyPollRun(likesActor,rec.runId,
+          s=>spTxt.textContent=`${prefix}Getting likes: ${s}`);
+        if (s2!=='SUCCEEDED') throw new Error(`Likes scrape ${s2.toLowerCase()}`);
+
+        const items=await apifyFetchItems(rec.datasetId);
+        const {added,dupes}=ingestLeads(items,source,clientId);
+        rec.costUsd=(postsData?.usageTotalUsd||0)+(likesData?.usageTotalUsd||0);
+        rec.status='done'; rec.resultsCount=added; rec.finishedAt=new Date().toISOString();
+        LS.set('jbj-scrapes',scrapeHistory);
+        renderAll();
+        toast(`${label}: +${added} leads from ${postUrls.length} posts${dupes?`, ${dupes} dupes`:''}`,'success');
+
+      } else {
+        // ── Standard single-step scrape ──
+        const actorId=getActorId(type);
+        rec.actorId=actorId;
+        spTxt.textContent=`${prefix}Starting ${label}…`;
+        const runData=await apifyStartRun(actorId,buildInput(type,target,maxR));
+        rec.runId=runData.id; rec.datasetId=runData.defaultDatasetId;
+        LS.set('jbj-scrapes',scrapeHistory);
+
+        const {status,runData:finalData}=await apifyPollRun(actorId,rec.runId,
+          s=>spTxt.textContent=`${prefix}${label}: ${s}`);
+        if (status!=='SUCCEEDED') {
+          rec.status='failed'; LS.set('jbj-scrapes',scrapeHistory);
+          toast(`${label} ${status.toLowerCase()}`,'error'); continue;
+        }
+        spTxt.textContent=`${prefix}Fetching ${label} results…`;
+        const items=await apifyFetchItems(rec.datasetId);
+        const {added,dupes}=ingestLeads(items,source,clientId);
+        rec.costUsd=finalData?.usageTotalUsd??null;
+        rec.status='done'; rec.resultsCount=added; rec.finishedAt=new Date().toISOString();
+        LS.set('jbj-scrapes',scrapeHistory);
+        renderAll();
+        toast(`${label}: +${added} leads${dupes?`, ${dupes} dupes`:''}`,'success');
+      }
     } catch(err) {
       rec.status='failed'; LS.set('jbj-scrapes',scrapeHistory);
-      toast(`${SCRAPE_TYPE_LABELS[type]||type}: ${err.message}`,'error');
+      toast(`${label}: ${err.message}`,'error');
     }
   }
 
