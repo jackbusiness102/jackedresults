@@ -600,12 +600,14 @@ select.input { cursor: pointer; }
         <input type="text" class="input actor-inp" data-key="comments" placeholder="apify/instagram-comment-scraper">
       </div>
       <div class="form-group">
-        <label class="form-label">Profile Followers</label>
-        <input type="text" class="input actor-inp" data-key="followers" placeholder="apify/instagram-scraper">
+        <label class="form-label">Profile Followers <span style="color:var(--text-3);font-weight:400;">— needs dedicated actor</span></label>
+        <input type="text" class="input actor-inp" data-key="followers" placeholder="jaroslavhejlek/instagram-followers">
+        <div class="form-hint">Search "instagram followers scraper" on apify.com/store if this doesn't work</div>
       </div>
       <div class="form-group">
-        <label class="form-label">Profile Following</label>
-        <input type="text" class="input actor-inp" data-key="following" placeholder="apify/instagram-scraper">
+        <label class="form-label">Profile Following <span style="color:var(--text-3);font-weight:400;">— needs dedicated actor</span></label>
+        <input type="text" class="input actor-inp" data-key="following" placeholder="jaroslavhejlek/instagram-followers">
+        <div class="form-hint">Search "instagram following scraper" on apify.com/store if this doesn't work</div>
       </div>
       <div class="form-group">
         <label class="form-label">Hashtag</label>
@@ -691,9 +693,11 @@ const SCRAPE_TYPE_LABELS = {
   'hashtag':'Hashtag','competitor-audience':'Competitor Audience'
 };
 const DEFAULT_ACTORS = {
-  likes:'datadoping/instagram-likes-scraper', comments:'apify/instagram-comment-scraper',
-  followers:'apify/instagram-scraper', following:'apify/instagram-scraper',
-  hashtag:'apify/instagram-hashtag-scraper'
+  likes:     'datadoping/instagram-likes-scraper',
+  comments:  'apify/instagram-comment-scraper',
+  followers: 'jaroslavhejlek/instagram-followers',
+  following: 'jaroslavhejlek/instagram-followers',
+  hashtag:   'apify/instagram-hashtag-scraper'
 };
 const SCRAPE_HINTS = {
   'post-likes':          ['Post URL',            'https://www.instagram.com/p/Cxxxxxxx/',           'Paste the full Instagram post or reel URL'],
@@ -1116,9 +1120,9 @@ function buildInput(type, target, maxR) {
     case 'post-comments':
       return {directUrls:[target.trim()], maxCommentsPerPost:max};
     case 'profile-followers':
-      return {usernames:[parseInstagramUsername(target)], resultsType:'followers', resultsLimit:max};
+      return {username: parseInstagramUsername(target), maxItems: max};
     case 'profile-following':
-      return {usernames:[parseInstagramUsername(target)], resultsType:'following', resultsLimit:max};
+      return {username: parseInstagramUsername(target), maxItems: max};
     case 'hashtag':
       return {hashtags:target.split(',').map(h=>h.trim().replace(/^#/,'')).filter(Boolean), resultsLimit:max};
     case 'competitor-audience':
